@@ -103,16 +103,15 @@ eq(eindgroepTypeUitFunctie("Krachtstroom"), "kracht", "6.5 krachtstroom een krac
 eq(eindgroepTypeUitFunctie("Wasmachine"), null, "6.6 een gewone groep krijgt geen type");
 eq(GROEPEN[1].eindgroepen[0].type, "laad", "6.7 en zo komt het in de aardlekgroep terecht");
 {
-  // HET GAT. Een warmtepomp bestaat in het paspoort (`wp`, met de
-  // gelijktijdigheidsfactor en een terugvalvermogen van 6,9 kW) maar niet als
-  // eindgroeptype. Hij komt dus zonder type binnen en belandt in het paspoort
-  // als `alg`: geen factor, geen terugval. Deze test legt dat vast zodat het een
-  // besluit blijft en geen vergetelheid wordt.
+  // De warmtepomp was tot 30-09-2026 het gat: het paspoort kende `wp` mét de
+  // gelijktijdigheidsfactor en een terugval van 6,9 kW, een eindgroep niet. Zo'n
+  // groep belandde als `alg` in de QR. Besluit Martin: toegevoegd als zesde type.
   eq(mkpType("Warmtepomp"), "wp", "6.8 het paspoort kent een warmtepomp");
-  eq(eindgroepTypeUitFunctie("Warmtepomp"), null, "6.9 maar een eindgroep niet — bekend gat");
-  eq(EINDGROEP_ONBEKEND, ["wp"], "6.10 en dat gat staat benoemd");
-  eq(Object.keys(EINDGROEP_UIT_MKP).concat(EINDGROEP_ONBEKEND).sort().join(","),
-     "bat,kook,lp,ov,pv,wp", "6.11 samen dekken ze elk paspoorttype behalve alg");
+  eq(eindgroepTypeUitFunctie("Warmtepomp"), "wp", "6.9 en een eindgroep nu ook");
+  eq(eindgroepTypeUitFunctie("Airco"), "wp", "6.10 een airco telt als warmtepomp, net als in het paspoort");
+  eq(EINDGROEP_ONBEKEND, [], "6.11 er is geen paspoorttype meer zonder eindgroep");
+  eq(Object.keys(EINDGROEP_UIT_MKP).sort().join(","),
+     "bat,kook,lp,ov,pv,wp", "6.12 de lijst dekt elk paspoorttype behalve alg");
 }
 
 console.log("▶ CATEGORIE 7: de zwaarst belaste groep, zoals het scherm hem kiest");

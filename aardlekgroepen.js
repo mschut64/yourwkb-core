@@ -30,18 +30,17 @@ import { blokIndeling } from "./indeling.js";
 
 // Paspoorttype → het eindgroeptype dat een opleverrapport kent.
 //
-// `wp` ontbreekt met opzet: er bestaat geen warmtepomp-eindgroep. Een
-// warmtepompgroep komt daardoor zonder type binnen, en belandt in het paspoort
-// als `alg` — waarmee hij zijn gelijktijdigheidsfactor en zijn terugvalvermogen
-// kwijtraakt. Dat is een gat in de app, geen keuze van deze vertaling; zie
-// `EINDGROEP_ONBEKEND` hieronder en de featurespec van het kastbeeld.
+// `wp` ontbrak hier tot 30-09-2026, omdat er geen warmtepomp-eindgroep bestond:
+// zo'n groep belandde als `alg` in het paspoort en raakte daarmee zijn
+// gelijktijdigheidsfactor en terugvalvermogen kwijt. Besluit Martin, 30-09-2026:
+// de warmtepomp is als zesde eindgroeptype toegevoegd, dus de lijst is compleet.
 export const EINDGROEP_UIT_MKP = {
-  kook: "kook", pv: "pv", lp: "laad", bat: "batterij", ov: "kracht",
+  kook: "kook", pv: "pv", lp: "laad", bat: "batterij", ov: "kracht", wp: "wp",
 };
 
-// De typen die het paspoort wel kent en een eindgroep niet. Wie deze lijst leeg
-// ziet worden, mag deze constante weghalen.
-export const EINDGROEP_ONBEKEND = ["wp"];
+// De paspoorttypen die een eindgroep niet kent. Leeg sinds de warmtepomp erbij
+// kwam; `alg` staat er bewust niet in, want dat ís "geen bijzonder type".
+export const EINDGROEP_ONBEKEND = [];
 
 export function eindgroepTypeUitFunctie(functie) {
   return EINDGROEP_UIT_MKP[mkpType(functie)] || null;
