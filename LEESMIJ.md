@@ -63,6 +63,7 @@ Een app voedt de motor dus met wat haar eigen `mkpBouw` al oplevert.
 | `leerlus.js` | de catalogus, wat het toestel mag verlaten, en de vrijgaveregel voor een promptwijziging |
 | `paspoort-kastbeeld.js` | **een meterkastpaspoort terug naar een kastbeeld**: `mat[]` levert de plaats, het merk en — via de typeaanduiding — de karakteristiek en de stroom |
 | `aardlekgroepen.js` | **de brug naar het opleverrapport**: modules op een rail → aardlekgroepen met eindgroepen |
+| `vormtaal.js` | **hoe de kast eruitziet**: `MODULE_PX`, de twee kleurladders (label én scherm) en `strookUitAardlekgroepen` — aardlekgroepen → één rail met modules, klaar om te tekenen |
 | `prompt.js` | **apart importeren** (`yourwkb-core/prompt.js`): de instructie en het JSON-schema voor het beeldmodel. Staat niet in de index — het is 22 kB die alleen een serverroute nodig heeft, en de audit eist dat hij server-side blijft. |
 
 ⚓ **Een scan blijft aanvulbaar.** Alles wat het kastbeeld oplevert is een voorstel,
@@ -79,7 +80,7 @@ ernaast is hoe de drift is ontstaan.
 ## Tests
 
 ```bash
-npm test      # 247 tests
+npm test      # 381 tests
 ```
 
 Geen framework: twee bestanden met eigen `eq()`, uitslag aan het eind, exitcode 1
@@ -93,6 +94,7 @@ en hieronder een regel erbij.
 
 | Versie | Wat |
 |---|---|
+| 0.7.0 | **De strook is één rail** (vraag Martin): `strookUitAardlekgroepen` gaf een rij per aardlekgroep en geeft nu `{ modules, breedte, breedtePx }` — één rail waarop de aardlekschakelaar een gewone module van twee is, precies zoals Kastscan de kast al tekende. Wie de kast in stukken knipt kan niet meer zien dat er achter de tweede aardlek nog vier modules ruimte is, en dát is de vraag bij een uitbreiding. **Twee gedragswijzigingen:** `MODULE_PX` 26 → 52 (de tapmaat uit design-spec §1.3, de maat die Kastscan gebruikt), en `AARDLEK_BAND` erbij — de verzadigde schermladder van Kastscan, náást de pastelladder van het label. Twee dragers, twee ladders: een pastelband van 7 px is op een donker scherm niet te zien, en dezelfde tint moet op stickerpapier juist wijken voor de tekst erboven. 38 tests erbij; de vormtaal had er nog geen. |
 | 0.6.1 | `strookUitAardlekgroepen` geeft per rij ook de `id` van de aardlekgroep terug. Een scherm kan daarmee van een tegel terug naar de groep zelf — op naam zoeken gaat mis zodra twee groepen dezelfde naam dragen. |
 | 0.6.0 | **De vormtaal van de kast** (K4): `MODULE_PX`, `AARDLEK_KLEUR`, `aardlekCode` en `strookUitAardlekgroepen`, verhuisd uit Kastscan. De maatvoering en de kleuren zijn gedeeld, de tekening blijft per app — zoals bij de fasebalken. |
 | 0.5.1 | Twee dingen die pas bleken toen er een echt paspoort doorheen ging: `parseBeveiliging` leest nu ook "gG20" (op een smeltpatroon staat geen B), en een aardlek zonder gelezen aanspreekstroom valt terug op 30 mA in plaats van leeg — leeg laten sloeg de ΔT/ΔI-toets stilletjes over. |

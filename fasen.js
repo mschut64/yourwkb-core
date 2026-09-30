@@ -22,6 +22,12 @@ export const FASEN = ["L1", "L2", "L3"];
 // oordeel van de kleur — oranje bij weinig ruimte, rood boven de capaciteit.
 export const FASE_KLEUR = { L1: "#2196F3", L2: "#9B59B6", L3: "#14B8A6" };
 
+// Toegankelijkheid (Kastscan-spec › Interactie 4): FASE NOOIT ALLEEN ALS KLEUR.
+// Naast het label L1/L2/L3 draagt elke fase een randpatroon, zodat de aanduiding
+// ook klopt voor wie kleuren niet onderscheidt — en op een geprinte pagina in
+// zwart-wit. Stond in Kastscan; hier omdat beide apps dezelfde kast tekenen.
+export const FASE_PATROON = { L1: "solid", L2: "dashed", L3: "dotted" };
+
 // Reserve die per fase vrij blijft. Een kast die precies vol is, is geen kast
 // waar de volgende monteur nog iets bij kan hangen.
 export const FASE_RESERVE_KW = 1.0;

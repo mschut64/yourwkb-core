@@ -28,7 +28,7 @@ export {
 } from "./vermogen.js";
 
 export {
-  FASEN, FASE_KLEUR, FASE_RESERVE_KW,
+  FASEN, FASE_KLEUR, FASE_PATROON, FASE_RESERVE_KW,
   faseCapaciteitKw, fasenVanGroep, belastingPerFase,
 } from "./fasen.js";
 
@@ -77,7 +77,8 @@ export {
 } from "./paspoort-kastbeeld.js";
 
 export {
-  MODULE_PX, AARDLEK_KLEUR, AARDLEK_KLEURNAAM, aardlekCode, strookUitAardlekgroepen,
+  MODULE_PX, AARDLEK_KLEUR, AARDLEK_KLEURNAAM, AARDLEK_BAND,
+  aardlekCode, aardlekBandKleur, strookUitAardlekgroepen,
 } from "./vormtaal.js";
 
 export { maakCorrectie, overtuigdFout, correctieStatistiek } from "./leren.js";
@@ -104,4 +105,4 @@ export {
 
 // De versie van de motor. Bij een gedragswijziging in een normregel hoort een
 // bewuste bump én een regel in LEESMIJ.md — de apps volgen een tag, geen branch.
-export const CORE_VERSIE = "0.6.1";
+export const CORE_VERSIE = "0.7.0";
