@@ -55,6 +55,19 @@ Een app voedt de motor dus met wat haar eigen `mkpBouw` al oplevert.
 | `fasen.js` | `FASEN`, `FASE_KLEUR`, `FASE_RESERVE_KW`, `faseCapaciteitKw`, `fasenVanGroep`, **`belastingPerFase`** |
 | `belasting.js` | `periodeLabel`, `basisbelastingKw` (geschat/gemeten), `belastingcheck` → `{ r, d }` |
 | `fasebalans.js` | `faseBalans` (capaciteit, reserve, oordeel, beste fase), `faseAdvies` (waar past een nieuw apparaat) |
+| `toestellen.js` | de woordenschat van een module op een rail: soorten, `parseBeveiliging` (`"B16"` ↔ karakteristiek + stroom), ordening |
+| `normaliseren.js` | ruwe modeluitvoer → een kastbeeld: `ZEKERHEIDSDREMPEL`, `INVULDREMPEL`, `normaliseerPositie`/`-Analyse`/`-Schema` |
+| `indeling.js` | welke groep achter welke aardlek: `pasVuistregelToe`, `pasFotoIndelingToe`, **`blokIndeling`** |
+| `verklaring.js` | de groepenverklaring van de kastdeur lezen en aan groepen koppelen |
+| `leren.js` | het correctielog: `maakCorrectie`, `overtuigdFout`, `correctieStatistiek` |
+| `leerlus.js` | de catalogus, wat het toestel mag verlaten, en de vrijgaveregel voor een promptwijziging |
+
+⚓ **Een scan blijft aanvulbaar.** Alles wat het kastbeeld oplevert is een voorstel,
+geen vaststelling: de herkomstvelden (`functieEigen`, `functieBron`, `naamBron`) en de
+zekerheid reizen mee, niets wordt bevroren, en wat de foto niet zag blijft leeg in plaats
+van geraden. Een scherm kan daardoor tonen wat voorgesteld is en wat bevestigd, en de
+installateur vult de rest in de app aan. Besluit Martin, 30-09-2026; bewaakt in
+`tests/test-kastbeeld.js` categorie 4.
 
 `belastingPerFase` is de **enige** optelling van een installatie. De
 belastingcheck en de fasebalans leunen er allebei op; een tweede optelling
@@ -63,7 +76,7 @@ ernaast is hoe de drift is ontstaan.
 ## Tests
 
 ```bash
-npm test      # 146 tests
+npm test      # 247 tests
 ```
 
 Geen framework: twee bestanden met eigen `eq()`, uitslag aan het eind, exitcode 1
@@ -77,4 +90,5 @@ en hieronder een regel erbij.
 
 | Versie | Wat |
 |---|---|
+| 0.2.0 | **Het kastbeeld erbij** (K1): het lezen van een kastfoto, de blokindeling, de groepenverklaring, het correctielog en de leerlus — 34 exports uit Kastscans `model.js` plus heel `leerlus.js`. Inhoud ongewijzigd, op één punt na: `correctieStatistiek` en `correctieStatistiekVoorDelen` waren bijna gelijk en zijn er één, met `ZEKERHEIDSDREMPEL` in plaats van een tweede hardgecodeerde 0,75. Geen gedragswijziging. |
 | 0.1.0 | Eerste versie. Inhoud ongewijzigd overgenomen uit YourWkb `components/wkb/model.js` + `fasebalans.js`, opgesplitst in modules met de namen van Kastscan. `faseCapaciteitKw` toegevoegd (stond als losse formule op drie plaatsen). Geen gedragswijziging. |

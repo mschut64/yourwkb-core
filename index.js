@@ -36,6 +36,49 @@ export { periodeLabel, basisbelastingKw, belastingcheck } from "./belasting.js";
 
 export { faseBalans, faseAdvies } from "./fasebalans.js";
 
+// ─── HET KASTBEELD ───────────────────────────────────────────────────────────
+//
+// Wat er in een kast hangt, hoe je dat uit een foto leest en hoe de app leert van
+// wat de installateur eraan verbetert. Verhuisd uit Kastscan op 30-09-2026, zodat
+// YourWkb dezelfde kast op dezelfde manier kan inlezen.
+//
+// ⚓ De foto vult in, de installateur bevestigt. Alles wat hier uitkomt is in de
+// app aan te vullen en te corrigeren; de herkomst- en zekerheidsvelden reizen mee
+// zodat een scherm kan laten zien wat voorgesteld is en wat bevestigd.
+
+export {
+  parseBeveiliging, formatBeveiliging,
+  KARAKTERISTIEKEN, AARDLEKTYPEN, RCD_MA, SOORTEN,
+  maakId, isGroepsoort, heeftKarakteristiek, isMeerpolig,
+  sorteerPosities, groepsnummers,
+} from "./toestellen.js";
+
+export {
+  pasVuistregelToe, indelingKoppeling, pasFotoIndelingToe, blokIndeling, indelingOnzeker,
+} from "./indeling.js";
+
+export {
+  splitsVerklaring, soortVerklaringsregel, splitsVerklaringsregels,
+  volgordeKandidaten, koppelOpVolgorde, koppelGroepenverklaring,
+} from "./verklaring.js";
+
+export {
+  ZEKERHEIDSDREMPEL, INVULDREMPEL, zekerheidVan,
+  zetStandaardnamen, ontdekVoortgang,
+  normaliseerPositie, normaliseerAnalyse, normaliseerSchema,
+} from "./normaliseren.js";
+
+export { maakCorrectie, overtuigdFout, correctieStatistiek } from "./leren.js";
+
+export {
+  DREMPEL_BEVESTIGINGEN, CATALOGUS_VELDEN, materiaalSleutel, legeCatalogus,
+  catalogusLeer, pseudoniem, catalogusZoek, vulAanUitCatalogus, saneerCatalogus,
+  catalogusSamenvoegen, reviewRij, catalogusStatistiek,
+  NAAMBRONNEN, naamMagGedeeld, bouwLeerset,
+  vergelijkPromptversies, oordeelOverWijziging,
+  EXPERT_WEGING, expertRonde, gewogenScore,
+} from "./leerlus.js";
+
 // De versie van de motor. Bij een gedragswijziging in een normregel hoort een
 // bewuste bump én een regel in LEESMIJ.md — de apps volgen een tag, geen branch.
-export const CORE_VERSIE = "0.1.0";
+export const CORE_VERSIE = "0.2.0";

@@ -1,6 +1,6 @@
 {
   "name": "yourwkb-core",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Gedeelde rekenkern van YourWkb en Kastscan: belasting, fasen en normkeuzes, op de paspoortvorm.",
   "type": "module",
   "main": "index.js",
@@ -10,11 +10,31 @@
     "./vermogen.js": "./vermogen.js",
     "./fasen.js": "./fasen.js",
     "./belasting.js": "./belasting.js",
-    "./fasebalans.js": "./fasebalans.js"
+    "./fasebalans.js": "./fasebalans.js",
+    "./toestellen.js": "./toestellen.js",
+    "./indeling.js": "./indeling.js",
+    "./verklaring.js": "./verklaring.js",
+    "./normaliseren.js": "./normaliseren.js",
+    "./leren.js": "./leren.js",
+    "./leerlus.js": "./leerlus.js"
   },
-  "files": ["index.js", "getallen.js", "vermogen.js", "fasen.js", "belasting.js", "fasebalans.js", "LEESMIJ.md"],
+  "files": [
+    "index.js",
+    "getallen.js",
+    "vermogen.js",
+    "fasen.js",
+    "belasting.js",
+    "fasebalans.js",
+    "LEESMIJ.md",
+    "toestellen.js",
+    "indeling.js",
+    "verklaring.js",
+    "normaliseren.js",
+    "leren.js",
+    "leerlus.js"
+  ],
   "scripts": {
-    "test": "node tests/test-belasting.js && node tests/test-fasebalans.js"
+    "test": "node tests/test-belasting.js && node tests/test-fasebalans.js && node tests/test-kastbeeld.js && node tests/test-leren.js"
   },
   "license": "UNLICENSED",
   "private": true
