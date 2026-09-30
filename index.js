@@ -50,7 +50,7 @@ export {
   parseBeveiliging, formatBeveiliging,
   KARAKTERISTIEKEN, AARDLEKTYPEN, RCD_MA, SOORTEN,
   maakId, isGroepsoort, heeftKarakteristiek, isMeerpolig,
-  sorteerPosities, groepsnummers,
+  sorteerPosities, groepsnummers, mkpType,
 } from "./toestellen.js";
 
 export {
@@ -67,6 +67,10 @@ export {
   zetStandaardnamen, ontdekVoortgang,
   normaliseerPositie, normaliseerAnalyse, normaliseerSchema,
 } from "./normaliseren.js";
+
+export {
+  EINDGROEP_UIT_MKP, EINDGROEP_ONBEKEND, eindgroepTypeUitFunctie, aardlekgroepenUitPosities,
+} from "./aardlekgroepen.js";
 
 export { maakCorrectie, overtuigdFout, correctieStatistiek } from "./leren.js";
 
@@ -92,4 +96,4 @@ export {
 
 // De versie van de motor. Bij een gedragswijziging in een normregel hoort een
 // bewuste bump én een regel in LEESMIJ.md — de apps volgen een tag, geen branch.
-export const CORE_VERSIE = "0.3.0";
+export const CORE_VERSIE = "0.4.0";

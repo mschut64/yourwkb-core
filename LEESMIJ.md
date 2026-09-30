@@ -61,6 +61,7 @@ Een app voedt de motor dus met wat haar eigen `mkpBouw` al oplevert.
 | `verklaring.js` | de groepenverklaring van de kastdeur lezen en aan groepen koppelen |
 | `leren.js` | het correctielog: `maakCorrectie`, `overtuigdFout`, `correctieStatistiek` |
 | `leerlus.js` | de catalogus, wat het toestel mag verlaten, en de vrijgaveregel voor een promptwijziging |
+| `aardlekgroepen.js` | **de brug naar het opleverrapport**: modules op een rail → aardlekgroepen met eindgroepen |
 | `prompt.js` | **apart importeren** (`yourwkb-core/prompt.js`): de instructie en het JSON-schema voor het beeldmodel. Staat niet in de index — het is 22 kB die alleen een serverroute nodig heeft, en de audit eist dat hij server-side blijft. |
 
 ⚓ **Een scan blijft aanvulbaar.** Alles wat het kastbeeld oplevert is een voorstel,
@@ -91,6 +92,7 @@ en hieronder een regel erbij.
 
 | Versie | Wat |
 |---|---|
+| 0.4.0 | **`aardlekgroepenUitPosities`** (K3): van modules op een rail naar aardlekgroepen met eindgroepen — de vorm waarin een opleverrapport een kast beschrijft. `mkpType` verhuisde mee uit Kastscan, zodat de vertaling naam → paspoorttype één tabel is. Niets wordt aangenomen: geen gelezen stroom geeft een leeg veld, een smeltveiligheid krijgt `gG` en niet stilletjes `B`, en de fase blijft leeg omdat die nooit uit een kastfoto komt. Bekend gat, vastgelegd in een test: het paspoort kent `wp` maar een eindgroep niet. |
 | 0.3.0 | **De prompt erbij** (K2): `INSTRUCTIE`, `SCHEMA`, `INSTRUCTIE_SCHEMA`, `SCHEMA_TEKENING` en `PROMPTVERSIE`, als data en apart te importeren. **Promptwijziging:** het JSON-voorbeeld in de instructie sprak het afgedwongen schema op drie punten tegen — `zekerheid` als object in plaats van een getal, `"blokken"` twee keer, en `"smeltveiligheid"` ontbrak bij de soorten. Het model kreeg dus een voorbeeld dat de API zou afkeuren. `PROMPTVERSIE` naar `kastscan-2026-09-30-A`; ⚠️ dit valt onder de vrijgaveregel en vraagt een verse run over de referentieset. |
 | 0.2.0 | **Het kastbeeld erbij** (K1): het lezen van een kastfoto, de blokindeling, de groepenverklaring, het correctielog en de leerlus — 34 exports uit Kastscans `model.js` plus heel `leerlus.js`. Inhoud ongewijzigd, op één punt na: `correctieStatistiek` en `correctieStatistiekVoorDelen` waren bijna gelijk en zijn er één, met `ZEKERHEIDSDREMPEL` in plaats van een tweede hardgecodeerde 0,75. Geen gedragswijziging. |
 | 0.1.0 | Eerste versie. Inhoud ongewijzigd overgenomen uit YourWkb `components/wkb/model.js` + `fasebalans.js`, opgesplitst in modules met de namen van Kastscan. `faseCapaciteitKw` toegevoegd (stond als losse formule op drie plaatsen). Geen gedragswijziging. |

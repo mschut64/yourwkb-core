@@ -115,3 +115,18 @@ export function groepsnummers(posities) {
   for (const p of volgorde) uit.set(p.id, toegekend.get(p.id));
   return uit;
 }
+
+// De naam van een groep naar het paspoorttype (spec v0.2 §4.4). Beide apps
+// hebben dit nodig: Kastscan om een gelezen groep in het paspoort te zetten,
+// YourWkb om een gescand paspoort terug te vertalen naar zijn eigen eindgroepen.
+// Eén tabel, want twee tabellen die hetzelfde bedoelen lopen uiteen.
+export function mkpType(functie) {
+  const n = String(functie || "").toLowerCase();
+  if (/kook|fornuis|oven/.test(n)) return "kook";
+  if (/zonnepane|pv/.test(n)) return "pv";
+  if (/batterij|accu/.test(n)) return "bat";
+  if (/laadpaal|laadpunt/.test(n)) return "lp";
+  if (/warmtepomp|airco/.test(n)) return "wp";
+  if (/kracht/.test(n)) return "ov";
+  return "alg";
+}
