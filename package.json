@@ -1,0 +1,21 @@
+{
+  "name": "yourwkb-core",
+  "version": "0.1.0",
+  "description": "Gedeelde rekenkern van YourWkb en Kastscan: belasting, fasen en normkeuzes, op de paspoortvorm.",
+  "type": "module",
+  "main": "index.js",
+  "exports": {
+    ".": "./index.js",
+    "./getallen.js": "./getallen.js",
+    "./vermogen.js": "./vermogen.js",
+    "./fasen.js": "./fasen.js",
+    "./belasting.js": "./belasting.js",
+    "./fasebalans.js": "./fasebalans.js"
+  },
+  "files": ["index.js", "getallen.js", "vermogen.js", "fasen.js", "belasting.js", "fasebalans.js", "LEESMIJ.md"],
+  "scripts": {
+    "test": "node tests/test-belasting.js && node tests/test-fasebalans.js"
+  },
+  "license": "UNLICENSED",
+  "private": true
+}
