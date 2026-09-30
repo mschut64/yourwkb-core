@@ -55,7 +55,7 @@ export function aardlekCode(ordinal) {
  * dezelfde kleurbanden, een andere indeling van het scherm.
  *
  * @param aardlekgroepen  zoals aardlekgroepenUitPosities ze oplevert
- * @returns  [{ code, kleur, kleurnaam, naam, fase, L, bron, breedte, tegels }]
+ * @returns  [{ id, code, kleur, kleurnaam, naam, fase, bron, breedte, tegels }]
  */
 export function strookUitAardlekgroepen(aardlekgroepen) {
   return (Array.isArray(aardlekgroepen) ? aardlekgroepen : []).map((ag, i) => {
@@ -77,6 +77,10 @@ export function strookUitAardlekgroepen(aardlekgroepen) {
       };
     });
     return {
+      // De identiteit van de aardlekgroep reist mee, zodat een scherm van een
+      // tegel terug kan naar de groep zelf. Niet op naam zoeken: twee groepen
+      // mogen dezelfde naam dragen, en dan wijst de tegel de verkeerde aan.
+      id: ag.id,
       code,
       kleur: AARDLEK_KLEUR[code],
       kleurnaam: AARDLEK_KLEURNAAM[code],
