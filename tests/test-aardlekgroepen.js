@@ -61,7 +61,11 @@ console.log("▶ CATEGORIE 2: niets wordt aangenomen wat niet gelezen is");
     ] }, "v1"), { bron: "foto" });
   eq(kaal[0].eindgroepen[0].ampere, "", "2.1 geen gelezen stroom geeft een leeg veld, niet 16A");
   eq(kaal[0].eindgroepen[0].kar, "", "2.2 en geen karakteristiek, niet B");
-  eq(kaal[0].rcdMa, "", "2.3 een aardlek zonder mA blijft leeg");
+  // Twee terugvallen, en allebei bewust: 30 mA en type A zijn wat een nieuwe
+  // groep in de app óók krijgt, en wat in een woning vrijwel altijd hangt. Leeg
+  // laten zou de ΔT/ΔI-toets in het rapport stilletjes overslaan — erger dan een
+  // voorstel dat de installateur langsloopt. Vandaar `bron`.
+  eq(kaal[0].rcdMa, "30", "2.3 een aardlek zonder gelezen mA valt terug op 30 mA");
   // Het type van de aardlek is de enige terugval, en die is bewust: "A" is wat
   // een nieuwe groep in de app toch al krijgt, en `bron` zegt erbij dat het uit
   // een foto komt.

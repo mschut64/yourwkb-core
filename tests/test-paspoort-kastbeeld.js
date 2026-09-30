@@ -140,6 +140,7 @@ console.log("▶ CATEGORIE 10: het blijft een gewoon, aanvulbaar kastbeeld");
   // Het RCD-type staat niet in het paspoort; het valt terug op de app-standaard
   // en moet dus door de installateur bevestigd worden.
   eq(GROEPEN.map((g) => g.rcdType), ["A", "A"], "10.4 het RCD-type valt terug op A — te bevestigen");
+  eq(GROEPEN.map((g) => g.rcdMa), ["30", "30"], "10.5 en de aanspreekstroom op 30 mA — eveneens");
 }
 
 console.log("\n═══════════════════════════════════════════════");

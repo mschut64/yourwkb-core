@@ -16,9 +16,13 @@ import { toNum } from "./getallen.js";
 // "B16" → { karakteristiek:"B", In:16 }. Accepteert ook "b 16", "C32", "16A".
 export function parseBeveiliging(s) {
   const t = String(s || "").toUpperCase().replace(/\s/g, "");
-  const m = t.match(/^([BCD])?(\d{1,3})A?$/);
+  // gG hoort erbij sinds een kast ook uit een meterkastpaspoort kan komen: op een
+  // smeltpatroon staat "gG20" en niet "B20". Het verschil is niet cosmetisch —
+  // bij gG komt Z_max uit een tijd-stroomkromme in plaats van uit factor × In,
+  // en wie het als B leest, toetst aan een norm die daar niet geldt.
+  const m = t.match(/^(GG|[BCD])?(\d{1,3})A?$/);
   if (!m) return { karakteristiek: "", In: null };
-  return { karakteristiek: m[1] || "", In: parseInt(m[2], 10) };
+  return { karakteristiek: m[1] === "GG" ? "gG" : (m[1] || ""), In: parseInt(m[2], 10) };
 }
 
 export function formatBeveiliging(karakteristiek, In) {

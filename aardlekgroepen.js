@@ -130,7 +130,11 @@ export function aardlekgroepenUitPosities(posities, opties = {}) {
       // "A" is in Nederland de gangbare uitvoering. Het blijft een voorstel:
       // `bron` zegt dat het uit een foto of paspoort komt.
       rcdType: String(a.aardlektype || "A"),
-      rcdMa: toNum(a.IAn) > 0 ? String(toNum(a.IAn)) : "",
+      // Zelfde redenering als bij het type: 30 mA is wat een nieuwe groep in de
+      // app krijgt en wat in een woning vrijwel altijd hangt. Leeg laten zou de
+      // ΔI-toets in het rapport stilletjes overslaan, en dát is erger dan een
+      // voorstel dat de installateur langsloopt.
+      rcdMa: toNum(a.IAn) > 0 ? String(toNum(a.IAn)) : "30",
       // `fase` is hier het AANTAL fasen ("1" of "3"), niet welke. Een meerpolige
       // aardlekschakelaar beveiligt een driefasecluster.
       fase: isMeerpolig(a) ? "3" : "1",

@@ -52,6 +52,10 @@ eq(parseBeveiliging("c 20"), { karakteristiek: "C", In: 20 }, "1.2 kleine letter
 eq(parseBeveiliging(""), { karakteristiek: "", In: null }, "1.3 niets leesbaars geeft niets");
 eq(formatBeveiliging("B", 16), "B16", "1.4 en weer terug");
 eq(formatBeveiliging("", 16), "16", "1.5 zonder karakteristiek alleen het getal");
+// gG: op een smeltpatroon staat "gG20". Wie dat als B20 leest, toetst Z_max aan
+// een vaste factor terwijl het uit een tijd-stroomkromme hoort te komen.
+eq(parseBeveiliging("gG20"), { karakteristiek: "gG", In: 20 }, "1.6 een smeltpatroon gG20");
+eq(parseBeveiliging("GG 63"), { karakteristiek: "gG", In: 63 }, "1.7 ook met hoofdletters en spatie");
 
 console.log("▶ CATEGORIE 2: wat een groep is, en wat niet");
 eq([isGroepsoort("automaat"), isGroepsoort("aardlekautomaat"), isGroepsoort("smeltveiligheid")],
