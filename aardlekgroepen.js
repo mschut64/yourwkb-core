@@ -103,6 +103,9 @@ export function aardlekgroepenUitPosities(posities, opties = {}) {
       kar: karVan(p),
       ampere: ampereVan(p),
       type: eindgroepTypeUitFunctie(p.functie),
+      // De breedte op de rail, voor de strook. Uit een foto of paspoort bekend,
+      // anders één module — wat een gewone automaat ook is.
+      modules: toNum(p.breedteModules) > 0 ? toNum(p.breedteModules) : 1,
       bron,
       // De herkomst van de naam reist mee: uit de groepenverklaring op de deur
       // weegt zwaarder dan uit de volgorde van het lijstje, en een scherm hoort
