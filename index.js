@@ -79,6 +79,17 @@ export {
   EXPERT_WEGING, expertRonde, gewogenScore,
 } from "./leerlus.js";
 
+// ─── DE PROMPT STAAT BEWUST NIET IN DEZE LIJST ───────────────────────────────
+//
+// `prompt.js` is alleen bereikbaar via het eigen pad:
+//
+//     import { INSTRUCTIE, SCHEMA } from "yourwkb-core/prompt.js";
+//
+// Twee redenen. (1) Hij is 22 kB tekst die alleen een serverroute nodig heeft;
+// via de index zou hij in de browserbundel van elke app kunnen belanden. (2) De
+// audit (BEV-02) eist dat de instructie server-side blijft — de client stuurt
+// alleen foto's. Een import die per ongeluk in schermcode terechtkomt valt zo op.
+
 // De versie van de motor. Bij een gedragswijziging in een normregel hoort een
 // bewuste bump én een regel in LEESMIJ.md — de apps volgen een tag, geen branch.
-export const CORE_VERSIE = "0.2.0";
+export const CORE_VERSIE = "0.3.0";
