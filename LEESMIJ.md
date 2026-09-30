@@ -7,6 +7,13 @@ Geen afhankelijkheden, draait in de browser én in Node 18+.
 
 ---
 
+*Publieke repo, maar geen open source: alle rechten voorbehouden. De code is te
+lezen — dat is zij in de browser toch al — en niet vrijgegeven voor hergebruik.
+Het meterkastpaspoort is dat wél (CC BY 4.0); dat is een standaard, dit is een
+motor.*
+
+---
+
 ## Waarom dit bestaat
 
 Tot 30-09-2026 hadden YourWkb en Kastscan elk hun eigen `model.js` met dezelfde
