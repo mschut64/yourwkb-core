@@ -81,7 +81,7 @@ ernaast is hoe de drift is ontstaan.
 ## Tests
 
 ```bash
-npm test      # 406 tests
+npm test      # 449 tests
 ```
 
 Geen framework: twee bestanden met eigen `eq()`, uitslag aan het eind, exitcode 1
@@ -95,6 +95,7 @@ en hieronder een regel erbij.
 
 | Versie | Wat |
 |---|---|
+| 0.8.1 | **De kast op meerdere rails.** `aardlekgroepenUitPosities` draagt `rail` en `plek` mee, en `strookUitAardlekgroepen` geeft `rails[]` terug in plaats van één rij. Een kast van twintig modules hangt op twee of drie rails, en een blok loopt vaak over de overgang heen — als één rij getekend klopt het beeld niet met de kast waar de installateur voor staat. Binnen een rail staan de modules **op plek en niet op blokvolgorde**; de kleurband houdt de blokken uit elkaar en loopt mee naar de volgende rail. Een met de hand ingevoerde kast heeft geen plaatsen en valt terug op één rail. Ook erbij: `materiaalUitPosities` (een gelezen kast is óók een materiaallijst) en `vergelijkKastbeelden` (is de kast veranderd t.o.v. de eerste foto — op kenmerk, niet op plaats). |
 | 0.8.0 | **De analyseroute erbij** (K5): `kastbeeld-route.js`, de serverkant van het lezen van een kastfoto. Stond alleen in Kastscan en gaat nu ook YourWkb bedienen — besluit Martin: *"het inlezen van de kast bij kastscan via foto moet ook als motor ingeregeld worden zodat beide apps hiervan gebruik kunnen maken"*. Inhoud ongewijzigd overgenomen, inclusief alle lessen die erin zitten: de foto's als ruwe bytes (base64 maakt een iPhone-opname een derde groter en breekt op de 4,5 MB van de hostingrand), een eigen tijdmuur net onder de zestig seconden, en een afbreking die als `APIUserAbortError` binnenkomt in plaats van als timeout. **De bewaking blijft van de app** — elke app heeft zijn eigen origin-lijst — en komt als parameter binnen: `maakKastbeeldRoute({ rateLimit, origineOk, fout, logNaam })`. 25 tests, statisch: zwevende aanroepen, de grenzen die om een gemeten reden staan waar ze staan, en de foutafhandeling die een avond zoeken heeft gekost. |
 | 0.7.0 | **De strook is één rail** (vraag Martin): `strookUitAardlekgroepen` gaf een rij per aardlekgroep en geeft nu `{ modules, breedte, breedtePx }` — één rail waarop de aardlekschakelaar een gewone module van twee is, precies zoals Kastscan de kast al tekende. Wie de kast in stukken knipt kan niet meer zien dat er achter de tweede aardlek nog vier modules ruimte is, en dát is de vraag bij een uitbreiding. **Twee gedragswijzigingen:** `MODULE_PX` 26 → 52 (de tapmaat uit design-spec §1.3, de maat die Kastscan gebruikt), en `AARDLEK_BAND` erbij — de verzadigde schermladder van Kastscan, náást de pastelladder van het label. Twee dragers, twee ladders: een pastelband van 7 px is op een donker scherm niet te zien, en dezelfde tint moet op stickerpapier juist wijken voor de tekst erboven. 38 tests erbij; de vormtaal had er nog geen. |
 | 0.6.1 | `strookUitAardlekgroepen` geeft per rij ook de `id` van de aardlekgroep terug. Een scherm kan daarmee van een tegel terug naar de groep zelf — op naam zoeken gaat mis zodra twee groepen dezelfde naam dragen. |

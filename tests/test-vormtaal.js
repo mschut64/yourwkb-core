@@ -104,9 +104,51 @@ eq(S.modules[0].eindId, null, "7.3 een aardlektegel niet");
 eq(new Set(S.modules.map((m) => m.id)).size, S.modules.length, "7.4 de identifiers zijn uniek");
 
 console.log("▶ CATEGORIE 8: een lege of kapotte kast geeft geen kapot beeld");
-eq(strookUitAardlekgroepen([]), { modules: [], breedte: 0, breedtePx: 0 }, "8.1 geen kast, geen strook");
+eq(strookUitAardlekgroepen([]), { rails: [], modules: [], breedte: 0, breedtePx: 0 }, "8.1 geen kast, geen strook");
 eq(strookUitAardlekgroepen(null).modules, [], "8.2 en geen lijst ook niet");
 eq(strookUitAardlekgroepen([{ id: "a" }]).modules.length, 1, "8.3 een groep zonder eindgroepen valt niet om");
+
+console.log("▶ CATEGORIE 9: meer dan één rail");
+// Een kast van twintig modules heeft twee of drie rails, en een blok kan over de
+// overgang heen lopen: de aardlek onderaan rail 1, de laatste groepen bovenaan
+// rail 2. Als één lange rij getekend klopt dat niet meer met de kast waar de
+// installateur voor staat — en dat is precies waar hij hem mee vergelijkt.
+{
+  const kast = [
+    { id:"a1", naam:"Aardlek A", rcdType:"A", rcdMa:"30", rail:1, plek:0, eindgroepen:[
+      { id:"e1", naam:"Keuken",  kar:"B", ampere:"16A", rail:1, plek:2 },
+      { id:"e2", naam:"Zolder",  kar:"B", ampere:"16A", rail:2, plek:0 },
+    ]},
+    { id:"a2", naam:"Aardlek B", rcdType:"A", rcdMa:"30", rail:2, plek:1, eindgroepen:[
+      { id:"e3", naam:"Laadpaal", kar:"C", ampere:"16A", rail:2, plek:3 },
+    ]},
+  ];
+  const s = strookUitAardlekgroepen(kast);
+  eq(s.rails.map((r) => r.rail), [1, 2], "9.1 twee rails, op nummer gesorteerd");
+  eq(s.rails[0].modules.map((m) => m.naam), ["Aardlek A", "Keuken"], "9.2 rail 1 draagt wat erop staat");
+  // DIT IS HET PUNT: een blok loopt door op de volgende rail, en de groep die
+  // daar hangt staat ook dáár — niet bij zijn aardlek op rail 1.
+  eq(s.rails[1].modules.map((m) => m.naam), ["Zolder", "Aardlek B", "Laadpaal"],
+     "9.3 rail 2 staat op plek, niet op blokvolgorde");
+  eq(s.rails[1].modules.map((m) => m.code), ["A1", "A2", "A2"],
+     "9.4 en de kleurband houdt de blokken uit elkaar");
+  eq([s.rails[0].breedte, s.rails[1].breedte], [3, 4], "9.5 elke rail telt zijn eigen modules");
+  eq(s.breedte, 7, "9.6 en de kast is de som daarvan");
+}
+{
+  // Met de hand ingevoerd: geen plaatsen, dus één rail in de volgorde waarin de
+  // groepen zijn aangemaakt. Een verzonnen plaats is erger dan geen.
+  const hand = strookUitAardlekgroepen([
+    { id:"a1", naam:"Aardlek A", rcdType:"A", rcdMa:"30", eindgroepen:[
+      { id:"e1", naam:"Licht" }, { id:"e2", naam:"Stopcontacten" },
+    ]},
+  ]);
+  eq(hand.rails.length, 1, "9.7 zonder plaatsen is het één rail");
+  eq(hand.rails[0].modules.map((m) => m.naam), ["Aardlek A", "Licht", "Stopcontacten"],
+     "9.8 in de volgorde waarin ze zijn aangemaakt");
+  eq(hand.rails[0].modules.every((m) => m.plek === -1), true, "9.9 met een lege plek, niet met een gok");
+}
+eq(strookUitAardlekgroepen([]).rails, [], "9.10 geen kast, geen rails");
 
 console.log("\n═══════════════════════════════════════════════");
 console.log(`RESULTAAT: ${passed} geslaagd · ${failed} mislukt · ${passed + failed} totaal`);

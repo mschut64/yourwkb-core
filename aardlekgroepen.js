@@ -106,6 +106,13 @@ export function aardlekgroepenUitPosities(posities, opties = {}) {
       // De breedte op de rail, voor de strook. Uit een foto of paspoort bekend,
       // anders één module — wat een gewone automaat ook is.
       modules: toNum(p.breedteModules) > 0 ? toNum(p.breedteModules) : 1,
+      // WAAR OP DE RAIL. Een kast van meer dan twintig modules heeft twee of drie
+      // rails, en een blok kan over de overgang heen lopen: de aardlek onderaan
+      // rail 1, de laatste groepen bovenaan rail 2. Zonder deze twee velden kan
+      // een scherm de kast alleen als één lange rij tekenen, en dan klopt het
+      // beeld niet met de kast waar de installateur voor staat.
+      rail: toNum(p.rail) > 0 ? toNum(p.rail) : 1,
+      plek: toNum(p.positie) >= 0 ? toNum(p.positie) : 0,
       bron,
       // De herkomst van de naam reist mee: uit de groepenverklaring op de deur
       // weegt zwaarder dan uit de volgorde van het lijstje, en een scherm hoort
@@ -121,6 +128,10 @@ export function aardlekgroepenUitPosities(posities, opties = {}) {
       return {
         id, naam: "Zonder aardlekschakelaar", rcdType: "geen", rcdMa: "",
         fase: "1", L: "", Lbron: "", bron,
+        // Een los cluster heeft zelf geen module op de rail; het begint waar zijn
+        // eerste groep staat.
+        rail: eindgroepen.length ? eindgroepen[0].rail : 1,
+        plek: eindgroepen.length ? eindgroepen[0].plek : 0,
         hoogstId: zwaarste(eindgroepen), eindgroepen,
       };
     }
@@ -146,6 +157,10 @@ export function aardlekgroepenUitPosities(posities, opties = {}) {
       L: ["L1", "L2", "L3"].includes(a.fase) ? a.fase : "",
       Lbron: ["L1", "L2", "L3"].includes(a.fase) ? bron : "",
       bron,
+      // Waar de aardlekschakelaar zelf op de rail staat — zie de toelichting bij
+      // de eindgroepen hierboven.
+      rail: toNum(a.rail) > 0 ? toNum(a.rail) : 1,
+      plek: toNum(a.positie) >= 0 ? toNum(a.positie) : 0,
       hoogstId: zwaarste(eindgroepen),
       eindgroepen,
     };

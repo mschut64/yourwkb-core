@@ -74,20 +74,26 @@ export function aardlekCode(ordinal) {
 }
 
 /**
- * De strook: ÉÉN rail met alle modules erop, in de volgorde waarin ze in de kast
- * hangen — aardlekschakelaar, de groepen die erachter hangen, de volgende
- * aardlekschakelaar. Klaar om te tekenen.
+ * De strook: de modules zoals ze in de kast hangen, PER RAIL.
  *
- * Eén rail en niet één rij per aardlekgroep (zoals YourWkb het tot 30-09-2026
- * deed): een kast is één rail, en wie hem in stukken knipt kan niet meer zien dat
- * de tweede aardlek nog vier modules ruimte heeft. Bij een uitbreiding is dát de
- * vraag. Kastscan tekent hem daarom sinds het begin zo, en het is dezelfde kast.
+ * Een kast van twintig modules heeft twee of drie rails, en een blok kan over de
+ * overgang heen lopen: de aardlekschakelaar onderaan rail 1, de laatste groepen
+ * bovenaan rail 2. Een kast die als één lange rij wordt getekend klopt dan niet
+ * meer met de kast waar de installateur voor staat — en dat is precies waar hij
+ * hem mee vergelijkt. Kastscan tekent per rail; sinds 02-10-2026 doet YourWkb dat
+ * ook (vraag Martin).
  *
- * De aardlekschakelaar staat als gewone module op de rail, niet als kopje boven
- * een rij: hij bezet twee modules en dat hoort in het beeld te zitten.
+ * Binnen een rail staan de modules op PLEK, niet op blokvolgorde: zo staat elke
+ * tegel waar hij in de kast staat. De kleurband houdt de blokken uit elkaar — dat
+ * is precies waarvoor hij bedoeld is, en waarom hij onder de strook hoort en niet
+ * als kopje erboven.
+ *
+ * Een kast die met de hand is ingevoerd heeft geen plaatsen; die valt terug op
+ * één rail in de volgorde waarin de groepen zijn aangemaakt.
  *
  * @param aardlekgroepen  zoals aardlekgroepenUitPosities ze oplevert
- * @returns  { modules, breedte, breedtePx }
+ * @returns  { rails, modules, breedte, breedtePx }
+ *           rails: [{ rail, modules, breedte, breedtePx }]
  */
 export function strookUitAardlekgroepen(aardlekgroepen) {
   const lijst = Array.isArray(aardlekgroepen) ? aardlekgroepen : [];
@@ -114,6 +120,8 @@ export function strookUitAardlekgroepen(aardlekgroepen) {
         ...blok,
         id: `rcd-${ag.id}`,
         soort: "rcd",
+        rail: toNum(ag.rail) > 0 ? toNum(ag.rail) : 1,
+        plek: toNum(ag.plek) >= 0 ? toNum(ag.plek) : -1,
         eindId: null,
         naam: ag.naam || "",
         // Wat er onderaan de tegel staat. Bij een aardlek is dat zijn
@@ -137,6 +145,8 @@ export function strookUitAardlekgroepen(aardlekgroepen) {
         ...blok,
         id: e.id,
         soort: "eind",
+        rail: toNum(e.rail) > 0 ? toNum(e.rail) : 1,
+        plek: toNum(e.plek) >= 0 ? toNum(e.plek) : -1,
         eindId: e.id,
         // Het groepsnummer, doorlopend over de hele rail — dezelfde nummering als
         // op de labels en in het groepenschema.
@@ -162,6 +172,27 @@ export function strookUitAardlekgroepen(aardlekgroepen) {
     if (!eindgroepen.length && modules.length) modules[modules.length - 1].laatsteVanBlok = true;
   });
 
+  // PER RAIL, en binnen een rail op plek. Een kast die met de hand is ingevoerd
+  // heeft geen plaatsen (plek -1); die houdt de volgorde waarin de groepen zijn
+  // aangemaakt, want een verzonnen plaats is erger dan geen.
+  const perRail = new Map();
+  for (const m of modules) {
+    if (!perRail.has(m.rail)) perRail.set(m.rail, []);
+    perRail.get(m.rail).push(m);
+  }
+  const rails = [...perRail.entries()]
+    .sort((a, b) => a[0] - b[0])
+    .map(([rail, lijst]) => {
+      const op = lijst.every((m) => m.plek >= 0)
+        ? [...lijst].sort((a, b) => a.plek - b.plek)
+        : lijst;
+      // De laatste module van een blok wijst de plek aan waar de volgende groep
+      // komt te hangen. Loopt een blok over twee rails, dan staat die plek op de
+      // rail waar het blok eindigt — en dat is waar hij hoort.
+      const breedteRail = op.reduce((n, m) => n + m.modules, 0);
+      return { rail, modules: op, breedte: breedteRail, breedtePx: breedteRail * MODULE_PX };
+    });
+
   const breedte = modules.reduce((n, m) => n + m.modules, 0);
-  return { modules, breedte, breedtePx: breedte * MODULE_PX };
+  return { rails, modules, breedte, breedtePx: breedte * MODULE_PX };
 }

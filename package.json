@@ -1,6 +1,6 @@
 {
   "name": "yourwkb-core",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "description": "Gedeelde rekenkern van YourWkb en Kastscan: belasting, fasen en normkeuzes, op de paspoortvorm.",
   "type": "module",
   "main": "index.js",
