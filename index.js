@@ -51,6 +51,7 @@ export {
   KARAKTERISTIEKEN, AARDLEKTYPEN, RCD_MA, SOORTEN,
   maakId, isGroepsoort, heeftKarakteristiek, isMeerpolig,
   sorteerPosities, groepsnummers, mkpType, materiaalUitPosities,
+  vergelijkKastbeelden,
 } from "./toestellen.js";
 
 export {

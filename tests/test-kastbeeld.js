@@ -185,6 +185,71 @@ console.log("▶ CATEGORIE 9: van ruw antwoord naar kastbeeld, in vaste volgorde
 }
 
 
+console.log("▶ CATEGORIE 10: is de kast veranderd t.o.v. de eerste foto?");
+// Stap 5 en 6 komen uit de foto van de BESTAANDE situatie, en het rapport
+// beschrijft de OPGELEVERDE installatie. Zijn er modules bijgekomen of vervangen
+// zonder dat het is doorgevoerd, dan beschrijft het rapport een kast die er niet
+// meer hangt. Vraag Martin, 02-10-2026.
+{
+  const voor = [
+    { soort:"hoofdschakelaar", In:40 },
+    { soort:"aardlek", aardlektype:"A", IAn:30 },
+    { soort:"automaat", karakteristiek:"B", In:16 },
+    { soort:"automaat", karakteristiek:"B", In:16 },
+  ];
+  eq(M.vergelijkKastbeelden(voor, voor).gelijk, true, "10.1 dezelfde kast is gelijk");
+  eq(M.vergelijkKastbeelden(voor, voor).erbij, [], "10.2 en levert geen meldingen op");
+
+  // Een uitbreiding: er komt een laadgroep bij.
+  const na = [...voor, { soort:"automaat", karakteristiek:"C", In:16 }];
+  const uit = M.vergelijkKastbeelden(voor, na);
+  eq(uit.gelijk, false, "10.3 een groep erbij is een wijziging");
+  eq(uit.erbij, [{ tekst:"automaat C16", aantal:1 }], "10.4 en wordt bij name genoemd");
+  eq(uit.weg, [], "10.5 er is niets verdwenen");
+  eq([uit.aantalOud, uit.aantalNieuw], [4, 5], "10.6 met het aantal modules erbij");
+}
+{
+  // DE KERN VAN DE OPZET: vergelijken op kenmerk, niet op plaats. Wie er een
+  // groep tussenschuift verschuift alles erachter één positie — op plaats
+  // vergelijken zou melden dat de halve kast gewijzigd is, en dat is precies het
+  // soort melding dat niemand meer leest.
+  const voor = [
+    { rail:1, positie:0, soort:"automaat", karakteristiek:"B", In:16 },
+    { rail:1, positie:1, soort:"automaat", karakteristiek:"B", In:20 },
+  ];
+  const na = [
+    { rail:1, positie:0, soort:"automaat", karakteristiek:"B", In:16 },
+    { rail:1, positie:1, soort:"automaat", karakteristiek:"C", In:16 },
+    { rail:1, positie:2, soort:"automaat", karakteristiek:"B", In:20 },
+  ];
+  const uit = M.vergelijkKastbeelden(voor, na);
+  eq(uit.erbij, [{ tekst:"automaat C16", aantal:1 }], "10.7 alleen de nieuwe module is nieuw");
+  eq(uit.weg, [], "10.8 de doorgeschoven modules gelden niet als verdwenen");
+}
+{
+  // Een vervanging is er één bij en één weg — dat moet je als installateur zien.
+  const voor = [{ soort:"automaat", karakteristiek:"B", In:16 }];
+  const na   = [{ soort:"automaat", karakteristiek:"B", In:20 }];
+  const uit = M.vergelijkKastbeelden(voor, na);
+  eq(uit.erbij, [{ tekst:"automaat B20", aantal:1 }], "10.9 de nieuwe waarde komt erbij");
+  eq(uit.weg,   [{ tekst:"automaat B16", aantal:1 }], "10.10 en de oude verdwijnt");
+}
+{
+  // Een aardlek vergelijkt op type én aanspreekstroom: van A naar B is een
+  // andere beveiliging, ook al staat hij op dezelfde plek.
+  const uit = M.vergelijkKastbeelden(
+    [{ soort:"aardlek", aardlektype:"A", IAn:30 }],
+    [{ soort:"aardlek", aardlektype:"B", IAn:30 }]);
+  eq(uit.gelijk, false, "10.11 een ander RCD-type is een wijziging");
+  eq(uit.erbij[0].tekst, "aardlek B 30mA", "10.12 met beide kenmerken in de tekst");
+}
+{
+  eq(M.vergelijkKastbeelden([], []).gelijk, true, "10.13 twee lege kasten zijn gelijk");
+  eq(M.vergelijkKastbeelden(null, null).gelijk, true, "10.14 en geen kast valt niet om");
+  eq(M.vergelijkKastbeelden([{ soort:"automaat" }], []).weg[0].tekst,
+     "automaat zonder gelezen waarde", "10.15 een module zonder waarden heet ook zo");
+}
+
 console.log("\n═══════════════════════════════════════════════");
 console.log(`RESULTAAT: ${passed} geslaagd · ${failed} mislukt · ${passed + failed} totaal`);
 console.log("═══════════════════════════════════════════════");

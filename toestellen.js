@@ -167,3 +167,68 @@ export function materiaalUitPosities(posities) {
   }
   return { lijst, zonderMerk };
 }
+
+// ─── IS DE KAST VERANDERD? ────────────────────────────────────────────────────
+//
+// Twee kastbeelden naast elkaar: die van vóór de werkzaamheden en die erna. De
+// vraag die dat beantwoordt is niet academisch — stap 5 en 6 komen uit de eerste
+// foto, en het rapport beschrijft de OPGELEVERDE installatie. Zijn er modules
+// bijgekomen of vervangen en is dat niet doorgevoerd, dan beschrijft het rapport
+// een kast die er niet meer hangt.
+//
+// De vergelijking gaat op KENMERK en niet op plaats. Wie er een groep tussen
+// schuift verschuift alles erachter een positie; op plaats vergelijken zou dan
+// melden dat de halve kast gewijzigd is, en dat is precies het soort melding dat
+// niemand meer leest. Twee automaten B16 van hetzelfde merk zijn uitwisselbaar —
+// er zijn er twee, en dat is wat telt.
+function kenmerkVan(p) {
+  const soort = p.soort || "overig";
+  if (soort === "aardlek" || soort === "aardlekautomaat") {
+    const deel = [p.aardlektype || "?", p.IAn ? `${p.IAn}mA` : "?mA"].join(" ");
+    return { sleutel: `${soort}|${deel}`, tekst: `${soort === "aardlek" ? "aardlek" : "aardlekautomaat"} ${deel}` };
+  }
+  if (soort === "hoofdschakelaar") {
+    return { sleutel: `hs|${p.In || "?"}`, tekst: `hoofdschakelaar ${p.In || "?"}A` };
+  }
+  const bev = formatBeveiliging(p.karakteristiek, p.In);
+  return { sleutel: `${soort}|${bev || "?"}`, tekst: `${soort} ${bev || "zonder gelezen waarde"}` };
+}
+
+function telPerKenmerk(posities) {
+  const telling = new Map();
+  for (const p of Array.isArray(posities) ? posities : []) {
+    const k = kenmerkVan(p);
+    const r = telling.get(k.sleutel) || { tekst: k.tekst, aantal: 0 };
+    r.aantal += 1;
+    telling.set(k.sleutel, r);
+  }
+  return telling;
+}
+
+/**
+ * Vergelijkt twee kastbeelden.
+ *
+ * @returns { gelijk, erbij, weg, aantalOud, aantalNieuw }
+ *          erbij/weg: [{ tekst, aantal }] — wat erbij kwam en wat verdween.
+ */
+export function vergelijkKastbeelden(oud, nieuw) {
+  const a = telPerKenmerk(oud);
+  const b = telPerKenmerk(nieuw);
+  const erbij = [];
+  const weg = [];
+
+  for (const [sleutel, r] of b) {
+    const had = a.get(sleutel);
+    const verschil = r.aantal - (had ? had.aantal : 0);
+    if (verschil > 0) erbij.push({ tekst: r.tekst, aantal: verschil });
+  }
+  for (const [sleutel, r] of a) {
+    const heeft = b.get(sleutel);
+    const verschil = r.aantal - (heeft ? heeft.aantal : 0);
+    if (verschil > 0) weg.push({ tekst: r.tekst, aantal: verschil });
+  }
+
+  const aantalOud = (Array.isArray(oud) ? oud : []).length;
+  const aantalNieuw = (Array.isArray(nieuw) ? nieuw : []).length;
+  return { gelijk: !erbij.length && !weg.length, erbij, weg, aantalOud, aantalNieuw };
+}
