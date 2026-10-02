@@ -1,6 +1,6 @@
 {
   "name": "yourwkb-core",
-  "version": "0.8.1",
+  "version": "0.9.0",
   "description": "Gedeelde rekenkern van YourWkb en Kastscan: belasting, fasen en normkeuzes, op de paspoortvorm.",
   "type": "module",
   "main": "index.js",
@@ -22,7 +22,13 @@
     "./paspoort-kastbeeld.js": "./paspoort-kastbeeld.js",
     "./vormtaal.js": "./vormtaal.js",
     "./kastbeeld-route.js": "./kastbeeld-route.js",
-    "./foto-client.js": "./foto-client.js"
+    "./foto-client.js": "./foto-client.js",
+    "./meting.js": "./meting.js",
+    "./organisatie.js": "./organisatie.js",
+    "./beoordeling.js": "./beoordeling.js",
+    "./leerlijn.js": "./leerlijn.js",
+    "./fasecheck-monitor.js": "./fasecheck-monitor.js",
+    "./palet.js": "./palet.js"
   },
   "files": [
     "index.js",
@@ -43,10 +49,16 @@
     "paspoort-kastbeeld.js",
     "vormtaal.js",
     "kastbeeld-route.js",
-    "foto-client.js"
+    "foto-client.js",
+    "meting.js",
+    "organisatie.js",
+    "beoordeling.js",
+    "leerlijn.js",
+    "fasecheck-monitor.js",
+    "palet.js"
   ],
   "scripts": {
-    "test": "node tests/test-belasting.js && node tests/test-fasebalans.js && node tests/test-kastbeeld.js && node tests/test-leren.js && node tests/test-prompt.js && node tests/test-aardlekgroepen.js && node tests/test-paspoort-kastbeeld.js && node tests/test-vormtaal.js && node tests/test-kastbeeld-route.js"
+    "test": "node tests/test-belasting.js && node tests/test-fasebalans.js && node tests/test-kastbeeld.js && node tests/test-leren.js && node tests/test-prompt.js && node tests/test-aardlekgroepen.js && node tests/test-paspoort-kastbeeld.js && node tests/test-vormtaal.js && node tests/test-kastbeeld-route.js && node tests/test-meting.js && node tests/test-organisatie.js && node tests/test-beoordeling.js && node tests/test-leerlijn.js && node tests/test-fasecheck-monitor.js"
   },
   "license": "UNLICENSED",
   "private": true,

@@ -83,6 +83,55 @@ export {
   aardlekCode, aardlekBandKleur, strookUitAardlekgroepen,
 } from "./vormtaal.js";
 
+// ─── DE MÉTING ───────────────────────────────────────────────────────────────
+//
+// De toets op wat gemeten is: de gG-tijd-stroomkromme, Z_max per beveiliging en
+// de cross-checks over een opleverset. Verhuisd uit YourWkb op 02-10-2026 omdat de
+// onderwijsapp dezelfde meetwaarden moet toetsen — en twee toetsingen van dezelfde
+// meting lopen vroeg of laat uiteen. ⚓ Een norm hoort bij een circuit, niet bij
+// een installatie.
+
+export {
+  GG_TABEL, GG_IN_WAARDEN, ggIaVoorTijd,
+  KAR_FACTOR, zMaxVoorBeveiliging, maxAfschakeltijdVoor,
+  zwaarsteEindgroep, veldBeveiliging,
+  gkCrossChecks, pvCrossChecks,
+} from "./meting.js";
+
+// ─── ORGANISATIES, LEREN EN MONITOREN ────────────────────────────────────────
+//
+// De bedrijfs- en de onderwijsapp (02-10-2026, conform het concept op Drive).
+// Wat hier staat is geen schermwerk maar afspraak: wie mag wat, wanneer is een
+// beoordeling af, wanneer is een skill gehaald, en wanneer vraagt een fase
+// aandacht. Dezelfde regels in beide apps, of ze lopen uiteen.
+
+export {
+  ORG_TYPES, ROLLEN, RECHTEN, mag, rollenVoor, magBeoordelen,
+  isOefen, oefenVlagVoor, bewaakScheiding, scheidOefen,
+} from "./organisatie.js";
+
+export {
+  STATUSSEN, STATUS_LABEL, ONDERDELEN, onderdelenVoor,
+  beoordelingStatus, beoordelingVoortgang, beoordelingCompleet,
+  cijferKader, volgendeActie, tellers,
+} from "./beoordeling.js";
+
+export {
+  NIVEAUS, SKILLS, BADGES, POORT_CIJFER,
+  skillsVoor, maxPunten, skillOpen, voortgang, streak, badges,
+  skillsUitKlus, verwerkBeoordeling, verwerkKennisantwoord, toegangTotHoofdapp,
+} from "./leerlijn.js";
+
+export {
+  NET_SPANNING, STIL_LETOP_MS, STIL_OFFLINE_MS,
+  BEZET_LETOP, BEZET_ERNSTIG, ONBALANS_LETOP_A, ONBALANS_ERNSTIG_A,
+  ampereUitKw, telegramNaarMeting, piekPerFase, bezetting, onbalans,
+  dongleStatus, monitorOordeel, monitorAdvies,
+  SESSIECODE_TEKENS, maakSessiecode, koppelControle,
+} from "./fasecheck-monitor.js";
+
+export { PALET, THEMAS, LETTERS, themaCss, kleuren } from "./palet.js";
+
 export { maakCorrectie, overtuigdFout, correctieStatistiek } from "./leren.js";
 
 export {
@@ -107,4 +156,4 @@ export {
 
 // De versie van de motor. Bij een gedragswijziging in een normregel hoort een
 // bewuste bump én een regel in LEESMIJ.md — de apps volgen een tag, geen branch.
-export const CORE_VERSIE = "0.8.1";
+export const CORE_VERSIE = "0.9.0";
