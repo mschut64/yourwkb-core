@@ -134,3 +134,36 @@ export function mkpType(functie) {
   if (/kracht/.test(n)) return "ov";
   return "alg";
 }
+
+// ─── DE MATERIAALLIJST ────────────────────────────────────────────────────────
+//
+// Van modules op een rail naar "3× Hager MCN116". Dezelfde lijst die `mat[]` in
+// het meterkastpaspoort draagt (spec v0.2 §4.5) en die een opleverrapport als
+// materiaalstaat toont.
+//
+// ⚓ EEN KAST DIE GELEZEN IS, IS ÓÓK EEN MATERIAALLIJST. Dat lijkt vanzelfsprekend
+// en werd het niet: de fotostap vulde wel de groepen maar niet het materiaal,
+// terwijl merk en typeaanduiding al op de posities stonden. Hetzelfde geldt voor
+// een gescand paspoort — daar staat `mat[]` letterlijk in, en dan hoeft er niets
+// meer ingetikt of gefotografeerd te worden.
+//
+// Wat NIET gebeurt: een toestel waarvan het merk of het type niet gelezen is,
+// wordt niet onder "Anders" geschoven of bij een ander merk geteld. Het telt
+// apart, zodat het scherm kan zeggen hoeveel er nog met de hand bij moeten.
+export function materiaalUitPosities(posities) {
+  const lijst = [];
+  const index = new Map();
+  let zonderMerk = 0;
+
+  for (const p of sorteerPosities(Array.isArray(posities) ? posities : [])) {
+    const fabrikant = String(p.fabrikant || "").trim();
+    const type = String(p.type || "").trim();
+    if (!type) { zonderMerk++; continue; }
+    const sleutel = `${fabrikant.toLowerCase()}|${type.toLowerCase()}`;
+    if (index.has(sleutel)) { index.get(sleutel).aantal += 1; continue; }
+    const regel = { fabrikant, type, soort: p.soort || "overig", aantal: 1 };
+    index.set(sleutel, regel);
+    lijst.push(regel);
+  }
+  return { lijst, zonderMerk };
+}

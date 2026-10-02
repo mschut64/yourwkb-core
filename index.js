@@ -50,7 +50,7 @@ export {
   parseBeveiliging, formatBeveiliging,
   KARAKTERISTIEKEN, AARDLEKTYPEN, RCD_MA, SOORTEN,
   maakId, isGroepsoort, heeftKarakteristiek, isMeerpolig,
-  sorteerPosities, groepsnummers, mkpType,
+  sorteerPosities, groepsnummers, mkpType, materiaalUitPosities,
 } from "./toestellen.js";
 
 export {
@@ -66,6 +66,7 @@ export {
   ZEKERHEIDSDREMPEL, INVULDREMPEL, zekerheidVan,
   zetStandaardnamen, ontdekVoortgang,
   normaliseerPositie, normaliseerAnalyse, normaliseerSchema,
+  positiesUitAnalyse, ONBRUIKBAAR_ADVIES, ONBRUIKBAAR_STANDAARD,
 } from "./normaliseren.js";
 
 export {

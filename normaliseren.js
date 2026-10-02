@@ -18,7 +18,8 @@ import {
   maakId, SOORTEN, KARAKTERISTIEKEN, AARDLEKTYPEN, parseBeveiliging,
   isGroepsoort, heeftKarakteristiek, groepsnummers, sorteerPosities,
 } from "./toestellen.js";
-import { pasVuistregelToe } from "./indeling.js";
+import { pasVuistregelToe, pasFotoIndelingToe } from "./indeling.js";
+import { koppelGroepenverklaring } from "./verklaring.js";
 
 // Zekerheidsdrempel. Onder deze waarde wordt een veld LEEG getoond met een
 // invulmarkering — nooit grijs voorgevuld (spec › Interactie 2: "Bij twijfel
@@ -253,3 +254,39 @@ export function normaliseerSchema(ruw, verdelerId) {
 
   return zetStandaardnamen(gekoppeld);
 }
+
+// ─── VAN RUW ANTWOORD NAAR KASTBEELD ─────────────────────────────────────────
+//
+// De vaste volgorde waarin het antwoord van het model een kast wordt. Hij stond
+// uitgeschreven in Kastscan; zodra een tweede app kasten leest moet die volgorde
+// gedeeld zijn, want elke stap erin verandert wat de installateur te zien krijgt.
+//
+// 1. normaliseren — ruwe uitvoer tegen de twee zekerheidsdrempels
+// 2. de blokindeling van de foto toepassen, als het model blokken zag
+// 3. de groepenverklaring van de kastdeur aan de juiste groep koppelen
+//
+// Wat hier NIET in zit: de materiaalcatalogus. Die is van de leerlus en per app
+// verschillend gevuld — hij hoort eromheen, niet erin.
+export function positiesUitAnalyse(json, id) {
+  const antwoord = json || {};
+  let posities = normaliseerAnalyse(antwoord, id);
+
+  const blokken = Array.isArray(antwoord.blokken) ? antwoord.blokken : [];
+  if (blokken.length) posities = zetStandaardnamen(pasFotoIndelingToe(posities, blokken));
+
+  const verklaring = Array.isArray(antwoord.groepenverklaring) ? antwoord.groepenverklaring : [];
+  const koppeling = koppelGroepenverklaring(posities, verklaring);
+  return { posities: koppeling.posities, ongekoppeld: koppeling.ongekoppeld || [] };
+}
+
+// Waarom een foto onbruikbaar was, en wat je eraan doet. Het ADVIES verschilt per
+// oorzaak: "maak een nieuwe, rechte opname" hielp niemand die per ongeluk de
+// watermeter had gefotografeerd.
+export const ONBRUIKBAAR_ADVIES = {
+  "geen-groepenkast": "Fotografeer de groepenkast zelf: het paneel met de rij groepen en aardlekschakelaars, niet de meters of een dichte kastdeur.",
+  "te-ver": "Ga dichterbij staan, zodat de kast het beeld vult.",
+  "onscherp": "Maak de foto opnieuw en houd de telefoon even stil; tik op de kast om scherp te stellen.",
+  "te-donker": "Zet het licht in de meterkast aan of gebruik de flitser.",
+  "afgedekt": "Open de kastdeur, zodat de groepen in beeld staan.",
+};
+export const ONBRUIKBAAR_STANDAARD = "Maak één nieuwe, rechte opname van dichtbij.";

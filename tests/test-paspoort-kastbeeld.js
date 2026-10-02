@@ -10,7 +10,7 @@
 
 import {
   positiesUitPaspoort, paspoortDraagtKast, leesPlaats, SOORT_UIT_MKP,
-  aardlekgroepenUitPosities, blokIndeling,
+  aardlekgroepenUitPosities, blokIndeling, materiaalUitPosities,
 } from "../index.js";
 
 let passed = 0, failed = 0;
@@ -141,6 +141,32 @@ console.log("▶ CATEGORIE 10: het blijft een gewoon, aanvulbaar kastbeeld");
   // en moet dus door de installateur bevestigd worden.
   eq(GROEPEN.map((g) => g.rcdType), ["A", "A"], "10.4 het RCD-type valt terug op A — te bevestigen");
   eq(GROEPEN.map((g) => g.rcdMa), ["30", "30"], "10.5 en de aanspreekstroom op 30 mA — eveneens");
+}
+
+console.log("▶ CATEGORIE 11: een gelezen kast is óók een materiaallijst");
+{
+  // Het paspoort draagt mat[] letterlijk; een foto levert merk en type per
+  // module. Beide geven dus dezelfde lijst — en dan hoeft er in de materiaalstap
+  // niets meer ingetikt te worden.
+  const { lijst, zonderMerk } = materiaalUitPosities(POSITIES);
+  eq(lijst.map((r) => `${r.aantal}x ${r.fabrikant} ${r.type}`),
+     ["1x Hager HIM440", "1x Hager CDA240D", "1x Hager CDC440D", "1x Hager B16", "1x Hager C16"],
+     "11.1 elk toestel uit het paspoort staat in de lijst");
+  eq(zonderMerk, 1, "11.2 de groep zonder merk telt apart, niet onder 'Anders'");
+}
+{
+  // Twee dezelfde automaten zijn één regel met aantal 2 — dat is wat een
+  // materiaalstaat is.
+  const dubbel = materiaalUitPosities([
+    { soort: "automaat", fabrikant: "Hager", type: "MCN116", rail: 1, positie: 1 },
+    { soort: "automaat", fabrikant: "hager", type: "mcn116", rail: 1, positie: 2 },
+    { soort: "automaat", fabrikant: "ABB", type: "MCN116", rail: 1, positie: 3 },
+  ]);
+  eq(dubbel.lijst.length, 2, "11.3 hoofdletters maken geen tweede regel");
+  eq(dubbel.lijst[0].aantal, 2, "11.4 maar ze worden wel geteld");
+  eq(dubbel.lijst[1].fabrikant, "ABB", "11.5 een ander merk is wél een eigen regel");
+  eq(materiaalUitPosities([]).lijst, [], "11.6 een lege kast geeft een lege lijst");
+  eq(materiaalUitPosities(null).zonderMerk, 0, "11.7 en geen kast valt niet om");
 }
 
 console.log("\n═══════════════════════════════════════════════");

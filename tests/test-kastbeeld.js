@@ -20,6 +20,7 @@ import {
   normaliseerPositie, normaliseerAnalyse, blokIndeling, pasVuistregelToe,
   splitsVerklaring, sorteerPosities,
 } from "../index.js";
+import * as M from "../index.js";
 
 let passed = 0, failed = 0;
 const failures = [];
@@ -140,6 +141,49 @@ console.log("▶ CATEGORIE 8: de volgorde op de rail");
   eq(door.map((p) => [p.rail, p.positie]), [[1, 1], [1, 5], [2, 0]],
      "8.1 rail voor rail, links naar rechts — zoals je ervoor staat");
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+console.log("▶ CATEGORIE 9: van ruw antwoord naar kastbeeld, in vaste volgorde");
+// De keten die een foto een kast maakt. Hij stond uitgeschreven in Kastscan;
+// zodra YourWkb ook kasten leest moet hij gedeeld zijn, want elke stap erin
+// verandert wat de installateur te zien krijgt.
+{
+  const antwoord = {
+    posities: [
+      { rail:1, positie:0, breedteModules:2, soort:"aardlek", IAn:30, aardlektype:"A", polen:2, zekerheid:0.9 },
+      { rail:1, positie:2, breedteModules:1, soort:"automaat", karakteristiek:"B", In:16, polen:1, groepstekst:"1", zekerheid:0.9 },
+      { rail:1, positie:3, breedteModules:1, soort:"automaat", karakteristiek:"B", In:16, polen:1, groepstekst:"2", zekerheid:0.9 },
+    ],
+    blokken: [{ aardlekIndex:0, groepIndexen:[1,2] }],
+    groepenverklaring: ["1 — Keuken", "2 — Wasmachine"],
+  };
+  const { posities } = M.positiesUitAnalyse(antwoord, "v1");
+  eq(posities.length, 3, "9.1 elke module komt terug");
+  eq(posities.filter(p=>p.soort==="automaat").map(p=>p.functie), ["Keuken","Wasmachine"],
+     "9.2 de groepenverklaring van de kastdeur zit op de juiste groep");
+  eq(posities.filter(p=>p.soort==="automaat").every(p=>p.aardlekId===posities[0].id), true,
+     "9.3 en de blokindeling van de foto hangt ze achter hun aardlek");
+}
+{
+  // Zonder blokken en zonder verklaring moet hij niet omvallen — dat is een
+  // kast die het model wel zag maar niet kon indelen.
+  const kaal = M.positiesUitAnalyse({ posities: [
+    { rail:1, positie:0, soort:"automaat", polen:1, zekerheid:0.9 },
+  ] }, "v1");
+  eq(kaal.posities.length, 1, "9.4 zonder blokken en verklaring blijft de module staan");
+  eq(M.positiesUitAnalyse({}, "v1").posities, [], "9.5 een leeg antwoord geeft een lege kast");
+  eq(M.positiesUitAnalyse(null, "v1").posities, [], "9.6 en geen antwoord ook");
+}
+{
+  // Het advies bij een onbruikbare foto verschilt per oorzaak: "maak een nieuwe,
+  // rechte opname" hielp niemand die per ongeluk de watermeter fotografeerde.
+  eq(Object.keys(M.ONBRUIKBAAR_ADVIES).sort().join(","),
+     "afgedekt,geen-groepenkast,onscherp,te-donker,te-ver", "9.7 vijf oorzaken, vijf adviezen");
+  eq(/groepenkast zelf/.test(M.ONBRUIKBAAR_ADVIES["geen-groepenkast"]), true,
+     "9.8 bij een verkeerd onderwerp zeggen we wát je moet fotograferen");
+  eq(typeof M.ONBRUIKBAAR_STANDAARD, "string", "9.9 en er is een terugval voor een onbekende oorzaak");
+}
+
 
 console.log("\n═══════════════════════════════════════════════");
 console.log(`RESULTAAT: ${passed} geslaagd · ${failed} mislukt · ${passed + failed} totaal`);
