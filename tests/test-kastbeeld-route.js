@@ -136,6 +136,25 @@ ok("6.2 beide schema's worden doorgegeven", /SCHEMA_TEKENING\s*:\s*SCHEMA/.test(
 ok("6.3 alleen jpeg, png en webp", /image\/jpeg/.test(client) && /image\/webp/.test(client));
 ok("6.4 image\\/jpg wordt gerepareerd", /image\/jpg/.test(ruw));
 
+console.log("▶ CATEGORIE 9: de SDK is optioneel hier, maar verplicht in de app");
+{
+  // De storing van 02-10-2026: YourWkb had @anthropic-ai/sdk niet in package.json,
+  // Next liet de import als external staan, de build bleef groen en élke scan gaf
+  // een 500 met "s is not a constructor". De route hoort dat zélf te zien en te
+  // zeggen wat je moet doen.
+  ok("9.1 de route controleert of de SDK er is", src.includes("function sdkProbleem("));
+  ok("9.2 en geeft een 503 met uitleg in plaats van een 500 zonder",
+     /sdkProbleem\(\)[\s\S]{0,260}fout\(503/.test(src));
+  ok("9.3 met de oplossing erbij: zet hem in package.json",
+     ruw.includes("package.json") && ruw.includes("@anthropic-ai/sdk"));
+  // Te laat controleren is niet controleren: dit moet vóór `new Anthropic()`.
+  ok("9.4 en die controle staat vóór `new Anthropic()`",
+     src.indexOf("sdkProbleem") < src.indexOf("new Anthropic()"));
+  // De controle zelf mag niets aanroepen dat er niet is.
+  ok("9.5 de controle gebruikt alleen typeof, geen aanroep van de SDK",
+     /typeof Anthropic !== "function"/.test(ruw));
+}
+
 console.log("\n═══════════════════════════════════════════════");
 console.log(`RESULTAAT: ${passed} geslaagd · ${failed} mislukt · ${passed + failed} totaal`);
 console.log("═══════════════════════════════════════════════");

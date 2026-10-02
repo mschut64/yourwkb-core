@@ -101,6 +101,23 @@ const TOEGESTANE_TYPEN = new Set(TYPENLIJST);
 // niets aan af te lezen is — in het veld stond er een keer letterlijk de
 // voorbeeldwaarde "sk-ant-..." in .env.local, en dat leverde alleen een
 // generieke 502 op.
+// En een tweede vraag die vóór de analyse hoort: IS DE SDK ER WEL? Hij staat hier
+// als optionele peerDependency — terecht, want een app die alleen rekent heeft hem
+// niet nodig. Maar een app die deze route gebruikt moet hem zelf in package.json
+// zetten, en als dat vergeten wordt laat Next.js de import als "external" staan:
+// de build blijft groen en `new Anthropic()` wordt `new undefined()`. Dat gaf op
+// 02-10-2026 in YourWkb een 500 op élke scan, met `TypeError: s is not a
+// constructor` als enige aanwijzing. Eén regel hier maakt daar een melding van die
+// zegt wat je moet doen.
+function sdkProbleem() {
+  if (typeof Anthropic !== "function") {
+    return "het pakket @anthropic-ai/sdk ontbreekt in deze app. Het is een optionele " +
+           "peerDependency van yourwkb-core, dus npm installeert het niet mee: zet " +
+           '"@anthropic-ai/sdk" in package.json en installeer opnieuw';
+  }
+  return "";
+}
+
 function sleutelProbleem() {
   const k = process.env.ANTHROPIC_API_KEY;
   if (!k) return "de sleutel ANTHROPIC_API_KEY ontbreekt";
@@ -153,8 +170,11 @@ export function maakKastbeeldRoute({ rateLimit, origineOk, fout, logNaam = "kast
     if (!rateLimit(request, { max: 20, perMs: 60 * 60 * 1000, naam: logNaam }))
       return fout(429, "Te veel scans — probeer het over een uur opnieuw");
 
-    // Vóór alles: klopt de sleutel? Een foutmelding hoort te zeggen wat je moet
-    // doen, niet alleen dat het niet lukte.
+    // Vóór alles: kan deze installatie überhaupt analyseren, en klopt de sleutel?
+    // Een foutmelding hoort te zeggen wat je moet doen, niet alleen dat het niet
+    // lukte.
+    const ontbreekt = sdkProbleem();
+    if (ontbreekt) return fout(503, `De foto-analyse kan op deze installatie niet starten: ${ontbreekt}.`);
     const probleem = sleutelProbleem();
     if (probleem) {
       // De WEG naar de oplossing verschilt per omgeving, en de vorige melding
