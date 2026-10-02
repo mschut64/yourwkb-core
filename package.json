@@ -1,6 +1,6 @@
 {
   "name": "yourwkb-core",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "Gedeelde rekenkern van YourWkb en Kastscan: belasting, fasen en normkeuzes, op de paspoortvorm.",
   "type": "module",
   "main": "index.js",
@@ -20,7 +20,9 @@
     "./prompt.js": "./prompt.js",
     "./aardlekgroepen.js": "./aardlekgroepen.js",
     "./paspoort-kastbeeld.js": "./paspoort-kastbeeld.js",
-    "./vormtaal.js": "./vormtaal.js"
+    "./vormtaal.js": "./vormtaal.js",
+    "./kastbeeld-route.js": "./kastbeeld-route.js",
+    "./foto-client.js": "./foto-client.js"
   },
   "files": [
     "index.js",
@@ -39,11 +41,21 @@
     "prompt.js",
     "aardlekgroepen.js",
     "paspoort-kastbeeld.js",
-    "vormtaal.js"
+    "vormtaal.js",
+    "kastbeeld-route.js",
+    "foto-client.js"
   ],
   "scripts": {
-    "test": "node tests/test-belasting.js && node tests/test-fasebalans.js && node tests/test-kastbeeld.js && node tests/test-leren.js && node tests/test-prompt.js && node tests/test-aardlekgroepen.js && node tests/test-paspoort-kastbeeld.js && node tests/test-vormtaal.js"
+    "test": "node tests/test-belasting.js && node tests/test-fasebalans.js && node tests/test-kastbeeld.js && node tests/test-leren.js && node tests/test-prompt.js && node tests/test-aardlekgroepen.js && node tests/test-paspoort-kastbeeld.js && node tests/test-vormtaal.js && node tests/test-kastbeeld-route.js"
   },
   "license": "UNLICENSED",
-  "private": true
+  "private": true,
+  "peerDependencies": {
+    "@anthropic-ai/sdk": ">=0.123.0"
+  },
+  "peerDependenciesMeta": {
+    "@anthropic-ai/sdk": {
+      "optional": true
+    }
+  }
 }

@@ -65,6 +65,7 @@ Een app voedt de motor dus met wat haar eigen `mkpBouw` al oplevert.
 | `aardlekgroepen.js` | **de brug naar het opleverrapport**: modules op een rail → aardlekgroepen met eindgroepen |
 | `vormtaal.js` | **hoe de kast eruitziet**: `MODULE_PX`, de twee kleurladders (label én scherm) en `strookUitAardlekgroepen` — aardlekgroepen → één rail met modules, klaar om te tekenen |
 | `prompt.js` | **apart importeren** (`yourwkb-core/prompt.js`): de instructie en het JSON-schema voor het beeldmodel. Staat niet in de index — het is 22 kB die alleen een serverroute nodig heeft, en de audit eist dat hij server-side blijft. |
+| `kastbeeld-route.js` | **apart importeren**: de serverkant van de foto-analyse — de route die Kastscan al draaide, met de 4,5 MB-muur van de hostingrand, de zestig seconden van het hobbyplan en de foutmeldingen die zeggen wát je moet doen. De bewaking (origin, rate limit) komt van de app, de analyse van hier. Trekt de Anthropic-SDK mee, dus nooit in een browserbundel. |
 
 ⚓ **Een scan blijft aanvulbaar.** Alles wat het kastbeeld oplevert is een voorstel,
 geen vaststelling: de herkomstvelden (`functieEigen`, `functieBron`, `naamBron`) en de
@@ -80,7 +81,7 @@ ernaast is hoe de drift is ontstaan.
 ## Tests
 
 ```bash
-npm test      # 381 tests
+npm test      # 406 tests
 ```
 
 Geen framework: twee bestanden met eigen `eq()`, uitslag aan het eind, exitcode 1
@@ -94,6 +95,7 @@ en hieronder een regel erbij.
 
 | Versie | Wat |
 |---|---|
+| 0.8.0 | **De analyseroute erbij** (K5): `kastbeeld-route.js`, de serverkant van het lezen van een kastfoto. Stond alleen in Kastscan en gaat nu ook YourWkb bedienen — besluit Martin: *"het inlezen van de kast bij kastscan via foto moet ook als motor ingeregeld worden zodat beide apps hiervan gebruik kunnen maken"*. Inhoud ongewijzigd overgenomen, inclusief alle lessen die erin zitten: de foto's als ruwe bytes (base64 maakt een iPhone-opname een derde groter en breekt op de 4,5 MB van de hostingrand), een eigen tijdmuur net onder de zestig seconden, en een afbreking die als `APIUserAbortError` binnenkomt in plaats van als timeout. **De bewaking blijft van de app** — elke app heeft zijn eigen origin-lijst — en komt als parameter binnen: `maakKastbeeldRoute({ rateLimit, origineOk, fout, logNaam })`. 25 tests, statisch: zwevende aanroepen, de grenzen die om een gemeten reden staan waar ze staan, en de foutafhandeling die een avond zoeken heeft gekost. |
 | 0.7.0 | **De strook is één rail** (vraag Martin): `strookUitAardlekgroepen` gaf een rij per aardlekgroep en geeft nu `{ modules, breedte, breedtePx }` — één rail waarop de aardlekschakelaar een gewone module van twee is, precies zoals Kastscan de kast al tekende. Wie de kast in stukken knipt kan niet meer zien dat er achter de tweede aardlek nog vier modules ruimte is, en dát is de vraag bij een uitbreiding. **Twee gedragswijzigingen:** `MODULE_PX` 26 → 52 (de tapmaat uit design-spec §1.3, de maat die Kastscan gebruikt), en `AARDLEK_BAND` erbij — de verzadigde schermladder van Kastscan, náást de pastelladder van het label. Twee dragers, twee ladders: een pastelband van 7 px is op een donker scherm niet te zien, en dezelfde tint moet op stickerpapier juist wijken voor de tekst erboven. 38 tests erbij; de vormtaal had er nog geen. |
 | 0.6.1 | `strookUitAardlekgroepen` geeft per rij ook de `id` van de aardlekgroep terug. Een scherm kan daarmee van een tegel terug naar de groep zelf — op naam zoeken gaat mis zodra twee groepen dezelfde naam dragen. |
 | 0.6.0 | **De vormtaal van de kast** (K4): `MODULE_PX`, `AARDLEK_KLEUR`, `aardlekCode` en `strookUitAardlekgroepen`, verhuisd uit Kastscan. De maatvoering en de kleuren zijn gedeeld, de tekening blijft per app — zoals bij de fasebalken. |
