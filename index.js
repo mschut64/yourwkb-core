@@ -134,6 +134,16 @@ export { PALET, THEMAS, LETTERS, themaCss, kleuren } from "./palet.js";
 
 export { maakCorrectie, overtuigdFout, correctieStatistiek } from "./leren.js";
 
+// De beoordeling van een kastfoto: wat er te zien is dat niet klopt. Een andere
+// taak dan het lezen van de kast, met een eigen prompt — en gekoppeld aan dezelfde
+// leerlus, zodat het oordeel van de installateur de check scherper maakt.
+export {
+  BEVINDING_SOORTEN, CATEGORIEEN, CATEGORIE_IDS, OORDELEN, OORDEEL_LABEL, categorieLabel,
+  normaliseerBevinding, normaliseerBeoordeling, sorteerBevindingen,
+  correctieUitOordeel, correctiesUitBeoordeling, expertRondeUitBeoordeling,
+  leerpuntUitBevinding, leerpuntenUitBeoordeling,
+} from "./bevindingen.js";
+
 export {
   DREMPEL_BEVESTIGINGEN, CATALOGUS_VELDEN, materiaalSleutel, legeCatalogus,
   catalogusLeer, pseudoniem, catalogusZoek, vulAanUitCatalogus, saneerCatalogus,
@@ -156,4 +166,4 @@ export {
 
 // De versie van de motor. Bij een gedragswijziging in een normregel hoort een
 // bewuste bump én een regel in LEESMIJ.md — de apps volgen een tag, geen branch.
-export const CORE_VERSIE = "0.9.0";
+export const CORE_VERSIE = "0.10.0";

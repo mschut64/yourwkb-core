@@ -94,8 +94,10 @@ ok("2.6 en worden nergens geïmporteerd", !/import[^\n]*guard/.test(src));
 
 console.log("▶ CATEGORIE 3: de prompt blijft server-side en komt uit één bron");
 ok("3.1 instructie en schema komen uit prompt.js", /from\s*"\.\/prompt\.js"/.test(ruw));
-ok("3.2 PROMPTVERSIE reist mee in het antwoord", /promptversie:\s*PROMPTVERSIE/.test(src));
-ok("3.3 de instructie staat in `system`, niet in het bericht", /system:\s*isSchema\s*\?\s*INSTRUCTIE_SCHEMA\s*:\s*INSTRUCTIE/.test(src));
+ok("3.2 de promptversie reist mee in het antwoord — en het is die van de gebruikte taak",
+   /promptversie:\s*isBeoordeling\s*\?\s*PROMPTVERSIE_BEOORDELING\s*:\s*PROMPTVERSIE/.test(src));
+ok("3.3 de instructie staat in `system`, niet in het bericht",
+   /system:\s*isBeoordeling\s*\?\s*INSTRUCTIE_BEOORDELING\s*:\s*isSchema\s*\?\s*INSTRUCTIE_SCHEMA\s*:\s*INSTRUCTIE/.test(src));
 ok("3.4 het schema wordt afgedwongen", /format:\s*\{\s*type:\s*"json_schema"/.test(ruw));
 
 console.log("▶ CATEGORIE 4: de grenzen staan waar ze om een gemeten reden staan");
@@ -153,6 +155,30 @@ console.log("▶ CATEGORIE 9: de SDK is optioneel hier, maar verplicht in de app
   // De controle zelf mag niets aanroepen dat er niet is.
   ok("9.5 de controle gebruikt alleen typeof, geen aanroep van de SDK",
      /typeof Anthropic !== "function"/.test(ruw));
+}
+
+console.log("▶ CATEGORIE 10: de derde modus — beoordelen in plaats van lezen");
+{
+  // De leesprompt zegt in regel 6 zelf dat beoordelen een andere taak is met een
+  // andere prompt. Die scheiding moet in de route te zien zijn, en niet alleen in
+  // de instructie.
+  ok("10.1 de route kent de modus 'beoordeling'", /gevraagd === "beoordeling"/.test(ruw));
+  ok("10.2 en kiest daarvoor de beoordelingsinstructie",
+     /isBeoordeling \? INSTRUCTIE_BEOORDELING/.test(src));
+  ok("10.3 met het bijbehorende schema", /isBeoordeling \? SCHEMA_BEOORDELING/.test(src));
+  // Het antwoord moet de versie dragen van de prompt die het maakte: de leerlus
+  // telt correcties per promptversie.
+  ok("10.4 en geeft de promptversie van de beoordeling terug, niet die van het lezen",
+     /promptversie: isBeoordeling \? PROMPTVERSIE_BEOORDELING : PROMPTVERSIE/.test(src));
+  // Een beoordeling op een dichte kast levert alleen "niet beoordeelbaar" op: de
+  // aansluiting is dan per definitie niet te zien. Vragen om de goede foto is beter.
+  ok("10.5 een beoordeling vraagt om de OPEN kast", /isBeoordeling\s*&&\s*!fotoOpen/.test(src));
+  ok("10.6 en zegt waaróm", /aansluiting niet te zien/.test(ruw));
+  // De drie modi delen alles behalve de instructie: één sleutelcontrole, één rate
+  // limit, één tijdmuur. Een tweede route zou die hele infrastructuur verdubbelen.
+  ok("10.7 er is nog steeds één client en één tijdmuur",
+     (src.match(/new Anthropic\(\)/g) || []).length === 1 &&
+     (src.match(/AbortSignal\.timeout/g) || []).length === 1);
 }
 
 console.log("\n═══════════════════════════════════════════════");

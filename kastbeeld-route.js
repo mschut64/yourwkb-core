@@ -34,6 +34,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import {
   PROMPTVERSIE, SCHEMA, INSTRUCTIE, SCHEMA_TEKENING, INSTRUCTIE_SCHEMA,
+  PROMPTVERSIE_BEOORDELING, SCHEMA_BEOORDELING, INSTRUCTIE_BEOORDELING,
 } from "./prompt.js";
 // De grenzen staan in foto-client.js, want de BROWSER moet dezelfde getallen
 // aanhouden: weegt de client anders dan de server, dan krijgt de gebruiker een
@@ -42,7 +43,7 @@ import { MAX_VERZOEK_BYTES, MAX_FOTO_BYTES, TOEGESTANE_TYPEN as TYPENLIJST } fro
 
 export { MAX_VERZOEK_BYTES };
 
-export { PROMPTVERSIE };
+export { PROMPTVERSIE, PROMPTVERSIE_BEOORDELING };
 
 // Claude Opus 5. Het vorige nummer (claude-sonnet-4-6) kwam uit YourWkb mee en
 // is inmiddels een generatie oud.
@@ -200,15 +201,27 @@ export function maakKastbeeldRoute({ rateLimit, origineOk, fout, logNaam = "kast
     let fotoDicht, fotoOpen, fotoSchema, modus;
     try {
       const form = await request.formData();
-      modus = form.get("modus") === "schema" ? "schema" : "kast";
+      // DRIE MODI, ÉÉN ROUTE. "kast" leest de verdeelinrichting, "schema" een
+      // eendraadschema, "beoordeling" kijkt naar dezelfde kastfoto's met de ogen
+      // van een inspecteur. Ze delen de sleutelcontrole, de rate limit, de tijdmuur
+      // en de foutafhandeling — alleen de instructie en de vorm van het antwoord
+      // verschillen.
+      const gevraagd = form.get("modus");
+      modus = gevraagd === "schema" ? "schema" : gevraagd === "beoordeling" ? "beoordeling" : "kast";
       fotoDicht = form.get("dicht");
       fotoOpen = form.get("open");
       fotoSchema = form.get("schema");
     } catch { return fout(400, "Onleesbare aanvraag"); }
 
     const isSchema = modus === "schema";
+    const isBeoordeling = modus === "beoordeling";
     if (isSchema ? !fotoSchema : (!fotoDicht && !fotoOpen))
       return fout(400, isSchema ? "Geen tekening meegestuurd" : "Geen foto meegestuurd");
+    // Een beoordeling leunt op de OPEN kast: de meeste bevindingen zitten in de
+    // aansluiting, en die is op een dichte kast per definitie niet te zien. Vragen
+    // om de goede foto is beter dan een lijst "niet beoordeelbaar" teruggeven.
+    if (isBeoordeling && !fotoOpen)
+      return fout(400, "Voor een controle is een foto van de OPEN kast nodig — op een dichte kast is de aansluiting niet te zien");
 
     const diagnose = [];
     let blokken;
@@ -231,9 +244,11 @@ export function maakKastbeeldRoute({ rateLimit, origineOk, fout, logNaam = "kast
     const inhoud = blokken.map((b) => (b.tekst ? { type: "text", text: b.tekst } : b));
     inhoud.push({
       type: "text",
-      text: isSchema
-        ? "Lees dit schema volgens de instructie."
-        : "Lees deze kast volgens de instructie.",
+      text: isBeoordeling
+        ? "Beoordeel deze kast volgens de instructie. Loop de hele zoeklijst af."
+        : isSchema
+          ? "Lees dit schema volgens de instructie."
+          : "Lees deze kast volgens de instructie.",
     });
 
     const client = new Anthropic();
@@ -246,13 +261,13 @@ export function maakKastbeeldRoute({ rateLimit, origineOk, fout, logNaam = "kast
       const stroom = client.messages.stream({
         model: MODEL,
         max_tokens: 16000,
-        system: isSchema ? INSTRUCTIE_SCHEMA : INSTRUCTIE,
+        system: isBeoordeling ? INSTRUCTIE_BEOORDELING : isSchema ? INSTRUCTIE_SCHEMA : INSTRUCTIE,
         // Een kast lezen is nauwkeurig werk: posities tellen, opdruk ontcijferen,
         // en per veld bepalen of je het écht kunt lezen. Daar hoort denken bij.
         thinking: { type: "adaptive" },
         output_config: {
           effort: EFFORT,
-          format: { type: "json_schema", schema: isSchema ? SCHEMA_TEKENING : SCHEMA },
+          format: { type: "json_schema", schema: isBeoordeling ? SCHEMA_BEOORDELING : isSchema ? SCHEMA_TEKENING : SCHEMA },
         },
         messages: [{ role: "user", content: inhoud }],
       }, { signal: AbortSignal.timeout(ANALYSE_BUDGET_MS) });
@@ -282,7 +297,10 @@ export function maakKastbeeldRoute({ rateLimit, origineOk, fout, logNaam = "kast
       // niet in een logbestand dat niemand kan lezen maar gewoon in het antwoord.
       return Response.json({
         ...JSON.parse(tekst),
-        promptversie: PROMPTVERSIE,
+        // De versie van de prompt die dit antwoord maakte — niet die van een
+        // andere taak. De leerlus telt correcties per promptversie; staat hier
+        // het verkeerde nummer, dan meet een volgende ronde iets anders dan hij denkt.
+        promptversie: isBeoordeling ? PROMPTVERSIE_BEOORDELING : PROMPTVERSIE,
         diagnose: {
           fotos: diagnose,
           model: MODEL,

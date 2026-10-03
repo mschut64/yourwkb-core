@@ -18,7 +18,7 @@
 // Voer uit met:  node tests/test-prompt.js
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { INSTRUCTIE, SCHEMA, INSTRUCTIE_SCHEMA, SCHEMA_TEKENING, PROMPTVERSIE } from "../prompt.js";
+import { INSTRUCTIE, SCHEMA, INSTRUCTIE_SCHEMA, SCHEMA_TEKENING, PROMPTVERSIE , INSTRUCTIE_BEOORDELING, SCHEMA_BEOORDELING, PROMPTVERSIE_BEOORDELING } from "../prompt.js";
 
 let passed = 0, failed = 0;
 const failures = [];
@@ -116,6 +116,35 @@ console.log("▶ CATEGORIE 7: de vrijgaveregel is af te dwingen");
   eq(/aardlekautomaat/.test(INSTRUCTIE), true, "7.3 inclusief de regel over de aardlekautomaat");
   eq(/fase/i.test(INSTRUCTIE), true, "7.4 en die over de fase, die nooit uit een foto komt");
 }
+
+console.log("▶ CATEGORIE 4: de beoordelingsprompt (kalibratie kasten Herman)");
+{
+  const cats = SCHEMA_BEOORDELING.properties.bevindingen.items.properties.categorie.enum;
+  const soorten = SCHEMA_BEOORDELING.properties.bevindingen.items.properties.soort.enum;
+  // Een categorie die wel in het schema staat maar niet in de instructie, wordt
+  // nooit gebruikt — en een die alleen in de instructie staat, wordt afgekeurd door
+  // de API. Ze moeten elkaar dekken.
+  for (const c of cats) {
+    eq(INSTRUCTIE_BEOORDELING.includes(`"${c}"`), true, `4.1 de instructie noemt categorie "${c}"`);
+  }
+  for (const s2 of soorten) {
+    eq(INSTRUCTIE_BEOORDELING.includes(`"${s2}"`), true, `4.2 de instructie noemt uitkomsttype "${s2}"`);
+  }
+  eq(soorten.length === 3, true,
+     "4.3 drie uitkomsttypen, niet meer");  // De regel waar de hele toon van afhangt.
+  eq(/ZONDER CONTROLEACTIE VERVALT/i.test(INSTRUCTIE_BEOORDELING), true,
+     "4.4 een vermoeden zonder controleactie vervalt — staat in de instructie");  eq(/open kast is de premisse/i.test(INSTRUCTIE_BEOORDELING) &&
+     /ontbrekende afdekplaat/i.test(INSTRUCTIE_BEOORDELING), true,
+     "4.5 de open kast is de premisse: geen meldingen over een ontbrekende afdekplaat");  eq(INSTRUCTIE_BEOORDELING.includes("Ik zie er geen"), true,
+     "4.6 'ik zie er geen' is niet hetzelfde als 'hij ontbreekt'");  eq(/keurt de installatie niet goed en niet af/i.test(INSTRUCTIE_BEOORDELING), true,
+     "4.7 de prompt keurt niets goed of af");  eq(/massieve ader/i.test(INSTRUCTIE_BEOORDELING) && /gasdicht/i.test(INSTRUCTIE_BEOORDELING), true,
+     "4.8 het verbindingsmiddel-versus-geleider-blok staat erin — daar zitten de meeste vondsten");  eq(/SPD/.test(INSTRUCTIE_BEOORDELING) && /niet als afkeur/i.test(INSTRUCTIE_BEOORDELING), true,
+     "4.9 overspanningsbeveiliging is een vraag, geen afkeur");  eq(/^kastcheck-\d{4}-\d{2}-\d{2}-[A-Z]$/.test(PROMPTVERSIE_BEOORDELING), true,
+     "4.10 de beoordeling heeft een EIGEN promptversie");  eq(PROMPTVERSIE_BEOORDELING !== PROMPTVERSIE, true,
+     "4.11 en die is niet die van het lezen");  // Het schema moet elk veld verplicht stellen: een ontbrekend veld in het antwoord
+  // is een veld dat de app moet raden.
+  eq(SCHEMA_BEOORDELING.properties.bevindingen.items.required.length === 7, true,
+     "4.12 elk veld van een bevinding is verplicht");}
 
 console.log("\n═══════════════════════════════════════════════");
 console.log(`RESULTAAT: ${passed} geslaagd · ${failed} mislukt · ${passed + failed} totaal`);
