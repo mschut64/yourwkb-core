@@ -27,10 +27,19 @@ export { niimbotB1 };
 
 export const DRIVERS = [niimbotB1];
 
-// Rechtstreeks printen is ONAF: de afdruk stopt na ongeveer 10 mm. Zie de
-// kopregel van niimbot.js. De app toont het daarom als proefonderdeel en zet
-// het A4-labelvel voorop — dat pad is wél volledig nagemeten.
-export const BLE_WERKT = false;
+// RECHTSTREEKS PRINTEN WERKT — sinds 03-10-2026 bevestigd door Martin op een
+// Niimbot B1 met labels van 30 × 50 mm: er komen hele labels uit.
+//
+// Dit stond hier maandenlang op `false` omdat de afdruk na ongeveer 10 mm stopte.
+// De diagnose van 01-09-2026 bleek precies goed: het lag niet aan de driver maar
+// aan de LABELDETECTIE van de printer, en de eerste stap die in de kop van
+// niimbot.js stond — de printer één keer met de Niimbot-app op deze labelrol
+// kalibreren — was de oplossing.
+//
+// ⚓ KALIBREREN IS EEN VOORWAARDE, GEEN TIP. Een printer die deze rol nog niet
+// kent, stopt halverwege het label. Een app die dit aanbiedt hoort dat te zeggen
+// vóór iemand een halve sticker op een kastdeur plakt.
+export const BLE_WERKT = true;
 
 export function beschikbareDrivers() {
   return DRIVERS.filter((d) => d.ondersteund());

@@ -6,9 +6,10 @@
 // zonder printer te toetsen en ze zijn met een echt label gemeten — het commentaar
 // bij de driver zegt waar de meting het van de documentatie won.
 //
-// ⚠️ WAT DEZE TESTS NIET BEWIJZEN: dat er een heel label uit komt. De afdruk stopt
-// na ongeveer 80 regels (10 mm van 30 mm), en dat is sinds 01-09-2026 uitgezocht:
-// alles aan deze kant van de lijn is uitgesloten. Zie de kop van printers/niimbot.js.
+// ⚠️ WAT DEZE TESTS NIET BEWIJZEN: dat er een heel label uit komt. Dát is een
+// veldwaarneming, en hij is er: Martin heeft het op 03-10-2026 bevestigd op een
+// Niimbot B1 met labels van 30 × 50 mm — ná één kalibratie met de Niimbot-app.
+// Zonder die kalibratie stopt de afdruk na 10 mm; zie de kop van printers/niimbot.js.
 //
 // Voer uit met:  node tests/test-printers.js
 // ─────────────────────────────────────────────────────────────────────────────
@@ -73,8 +74,8 @@ console.log("▶ CATEGORIE 4: compressie van witregels");
 }
 
 console.log("▶ CATEGORIE 5: de laag is eerlijk over wat hij kan");
-eq(BLE_WERKT, false,
-   "5.1 ⚓ rechtstreeks printen staat op ONAF — de afdruk stopt na ±10 mm (veldtest 01-09-2026)");
+eq(BLE_WERKT, true,
+   "5.1 rechtstreeks printen werkt — veldbevestigd 03-10-2026, na één kalibratie");
 eq(typeof niimbotB1.verbind, "function", "5.2 de driver kan verbinden");
 eq(typeof niimbotB1.printBitmaps, "function", "5.3 en bitmaps versturen");
 eq(typeof niimbotB1.ondersteund, "function", "5.4 en zeggen of de browser hem aankan");

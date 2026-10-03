@@ -18,34 +18,34 @@
 // het deel dat in v2.0 de symbolen liet wegvallen, en dat deel is hier dicht.
 //
 // ─────────────────────────────────────────────────────────────────────────────
-// STAND VAN ZAKEN — ONAF. LEES DIT VOOR JE HIER TIJD IN STEEKT.
+// STAND VAN ZAKEN — WERKT, NA ÉÉN KALIBRATIE
 //
-// Verbinden werkt. Aansturen werkt. Wat NIET werkt: de afdruk stopt na ongeveer
-// 80 regels, dus na zo'n 10 mm van een label van 30 mm.
+// Bevestigd door Martin op 03-10-2026: op een Niimbot B1 met labels van 30 × 50 mm
+// komen hele labels uit deze driver.
 //
-// In de veldtest van 01-09-2026 is dat systematisch nagelopen. Het stopt op
-// exact dezelfde plek bij:
+// Dat was maanden anders, en de geschiedenis blijft hier staan omdat zij het
+// antwoord bevatte. De afdruk stopte na ongeveer 80 regels — 10 mm van een label
+// van 30. In de veldtest van 01-09-2026 is dat systematisch nagelopen. Het stopte
+// op exact dezelfde plek bij:
 //   • een label met veel data en een label met weinig data
 //   • drie verschillende verzendwijzen (klein met pauze, groot zonder pauze,
 //     groot met bevestiging per pakket)
 //   • met en zonder samenvoegen van gelijke regels
 //   • de oorspronkelijke pakketvolgorde en die uit de gepubliceerde beschrijving
 //
-// Alles wat via deze driver de deur uit gaat is daarmee uitgesloten. Wat
-// overblijft is de printer zelf: 80 regels is 10 mm, en dat wijst op de
-// labeldetectie — de printer denkt dat het label op is. Dat is geen
-// protocolkwestie maar een kalibratie van de printer op deze labelrol, en die
-// zet je niet met bytes.
+// Daarmee was alles aan déze kant van de lijn uitgesloten, en de conclusie luidde:
+// 80 regels is 10 mm, dat wijst op de labeldetectie — de printer denkt dat het
+// label op is. De eerste stap die hier stond was dan ook niet in code maar in de
+// printer: KALIBREER HEM ÉÉN KEER OP DEZE ROL MET DE OFFICIËLE NIIMBOT-APP, zodat
+// hij de labellengte leert.
 //
-// EERSTE STAP VOOR WIE HIER VERDER GAAT, en niet in deze code:
-//   1. Kalibreer de printer één keer op deze rol met de officiële Niimbot-app.
-//      Daarmee leert hij de labellengte. Werkt het daarna wel, dan is deze
-//      driver af en hoeft er niets aan te veranderen.
-//   2. Werkt het dan nog niet, kijk dan naar SetLabelType. Er gaat nu een 1 uit
-//      (gestanste labels met tussenruimte); 2 is zwartmerk, 3 doorlopend.
-//      Dat is één byte en vier mogelijkheden.
+// Dat was het. Aan deze driver is niets veranderd.
 //
-// Wat WEL aantoonbaar goed is en niet meer onderzocht hoeft te worden:
+// ⚓ DUS: KALIBREREN IS EEN VOORWAARDE. Wie een printer aansluit die deze rol niet
+// kent, krijgt halve stickers — en dat lijkt een fout in de app. Elke app die dit
+// aanbiedt hoort het te zeggen vóórdat er geprint wordt.
+//
+// Wat al vaststond en niet meer onderzocht hoeft te worden:
 //   • de rasterisatie: 240 × 400 dots, 1-bit, harde drempel, geen herschaling
 //   • de regellengte: 48 bytes bij 384 dots — de diagonaal op het
 //     kalibratielabel kwam kaarsrecht uit
