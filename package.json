@@ -33,7 +33,10 @@
     "./labels.js": "./labels.js",
     "./render.js": "./render.js",
     "./schema.js": "./schema.js",
-    "./documenten.js": "./documenten.js"
+    "./documenten.js": "./documenten.js",
+    "./printers": "./printers/index.js",
+    "./printers/index.js": "./printers/index.js",
+    "./printers/niimbot.js": "./printers/niimbot.js"
   },
   "files": [
     "index.js",
@@ -65,10 +68,11 @@
     "labels.js",
     "render.js",
     "schema.js",
-    "documenten.js"
+    "documenten.js",
+    "printers"
   ],
   "scripts": {
-    "test": "node tests/test-belasting.js && node tests/test-fasebalans.js && node tests/test-kastbeeld.js && node tests/test-leren.js && node tests/test-prompt.js && node tests/test-aardlekgroepen.js && node tests/test-paspoort-kastbeeld.js && node tests/test-vormtaal.js && node tests/test-kastbeeld-route.js && node tests/test-meting.js && node tests/test-organisatie.js && node tests/test-beoordeling.js && node tests/test-leerlijn.js && node tests/test-fasecheck-monitor.js && node tests/test-bevindingen.js && node tests/test-documenten.js"
+    "test": "node tests/test-belasting.js && node tests/test-fasebalans.js && node tests/test-kastbeeld.js && node tests/test-leren.js && node tests/test-prompt.js && node tests/test-aardlekgroepen.js && node tests/test-paspoort-kastbeeld.js && node tests/test-vormtaal.js && node tests/test-kastbeeld-route.js && node tests/test-meting.js && node tests/test-organisatie.js && node tests/test-beoordeling.js && node tests/test-leerlijn.js && node tests/test-fasecheck-monitor.js && node tests/test-bevindingen.js && node tests/test-documenten.js && node tests/test-printers.js"
   },
   "license": "UNLICENSED",
   "private": true,
