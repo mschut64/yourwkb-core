@@ -388,6 +388,20 @@ function marge(breedteMm) {
 // smalle label gaat het jaartal daarom met twee cijfers: "01-09-26" past met
 // ruim een millimeter over. Het blijft een revisiedatum, en §9 vraagt niet om
 // vier cijfers.
+// ⚓ DE DATUM OP EEN LABEL IS dd-mm-jjjj, MET VOORLOOPNULLEN. Daar rekent
+// `voetDatum` hieronder op: alleen een datum in díé vorm wordt op het smalle
+// label ingekort tot een jaartal van twee cijfers. Een app die haar datum door
+// `toLocaleDateString("nl-NL")` haalt krijgt "3-10-2026" terug — zonder nul, dus
+// het inkorten grijpt niet, en de datum loopt op het smalle label één teken over
+// de rand. Dat is precies wat er gebeurde, en het gaf een melding "kort de naam
+// in" over een datum die niemand getypt had. Gebruik deze functie en niet je
+// eigen opmaak; de eis hoort bij het label, niet bij het scherm.
+export function labelDatum(d) {
+  const t = d instanceof Date ? d : new Date(d || Date.now());
+  const p = (n) => String(n).padStart(2, "0");
+  return `${p(t.getDate())}-${p(t.getMonth() + 1)}-${t.getFullYear()}`;
+}
+
 export function voetDatum(datum, breedteMm) {
   const d = String(datum || "");
   if (breedteMm > DRAGER.breedSmalMm) return d;

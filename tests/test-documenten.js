@@ -16,7 +16,7 @@
 
 import { positiesUitAardlekgroepen, aardlekgroepenUitPosities, komma, aardlekKleur,
          aardlekKleurNaam, faseBalans } from "../index.js";
-import { labelSelectie, controleerPassend, korteNaam } from "../labels.js";
+import { labelSelectie, controleerPassend, korteNaam, labelDatum, voetDatum } from "../labels.js";
 import { groepenoverzichtHtml, labelvelHtml, schemaHtml, velIndeling, ontsmet } from "../documenten.js";
 import { readFileSync } from "node:fs";
 import { schemaVanKast, ontwerpSchema } from "../schema.js";
@@ -196,6 +196,35 @@ console.log("▶ CATEGORIE 7: wiens document is dit");
   // Een kop met een leeg vak eronder leest als een fout; dan liever geen kop.
   eq(HTML.includes("Verdeling over de fasen"), false,
      "7.6 zonder balans staat de fasekop er niet — een lege kop oogt als een storing");
+}
+
+// ─── CATEGORIE 8: de datum op het label ──────────────────────────────────────
+//
+// `voetDatum` kort het jaartal alleen in als de datum er als dd-mm-jjjj uitziet.
+// YourWkb gaf hem door `toLocaleDateString("nl-NL")`, en die laat de voorloopnul
+// weg: "3-10-2026". Het inkorten greep dus niet, de datum liep op het smalle
+// label één teken over de rand, en de passendheidscontrole meldde "kort de naam
+// in" over een datum die niemand had getypt. Deze tests leggen die eis vast.
+{
+  console.log("▶ CATEGORIE 8: de datum op het label");
+
+  eq(labelDatum(new Date(2026, 9, 3)), "03-10-2026", "8.1 dag en maand met een voorloopnul");
+  eq(labelDatum(new Date(2026, 11, 25)), "25-12-2026", "8.2 en zonder als ze niet nodig is");
+  eq(/^\d{2}-\d{2}-\d{4}$/.test(labelDatum()), true, "8.3 zonder argument is het vandaag, in dezelfde vorm");
+
+  // De negatieve controle: dit is precies wat er misging.
+  eq(voetDatum("3-10-2026", 15), "3-10-2026",
+     "8.4 een datum zonder voorloopnul wordt NIET ingekort — daar zat de fout");
+  eq(voetDatum(labelDatum(new Date(2026, 9, 3)), 15), "03-10-26",
+     "8.5 met labelDatum wordt hij dat wel");
+  eq(voetDatum(labelDatum(new Date(2026, 9, 3)), 30), "03-10-2026",
+     "8.6 op het brede label blijft het jaartal voluit");
+
+  // En de controle die de installateur te zien krijgt, moet er dan ook over zwijgen.
+  const smal = labelSelectie({ id: "v1", posities: positiesUitAardlekgroepen(AARDLEKGROEPEN) },
+                             { datum: labelDatum(new Date(2026, 9, 3)) });
+  const datumfouten = smal.flatMap(l => controleerPassend(l).filter(f => /\d{2}-\d{2}-\d{2}/.test(f.tekst)));
+  eq(datumfouten.length, 0, "8.7 geen enkele sticker klaagt nog over de datum");
 }
 
 console.log("\n═══════════════════════════════════════════════");
