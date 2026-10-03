@@ -166,3 +166,97 @@ export function aardlekgroepenUitPosities(posities, opties = {}) {
     };
   });
 }
+
+// ─── DE BRUG TERUG ───────────────────────────────────────────────────────────
+//
+// `aardlekgroepenUitPosities` gaat van modules op een rail naar de vorm waarin een
+// opleverrapport een kast beschrijft. Dit is de weg terug, en die is er sinds
+// 03-10-2026 om één reden: het labelvel, het groepenoverzicht en het
+// installatieschema zijn getekend op de MODULEVORM. YourWkb kent die vorm alleen
+// na een fotoscan of een gescand paspoort — maar een kast die met de hand is
+// ingevuld moet net zo goed een sticker en een schema kunnen opleveren.
+//
+// ⚓ WAT ER NIET IS, WORDT NIET VERZONNEN. Een met de hand ingevulde kast heeft
+// geen fabrikant, geen type en geen plaats op de rail. Die velden blijven leeg en
+// de plaatsen worden doorlopend genummerd in de volgorde waarin de groepen staan —
+// dat is geen aflezing en de documenten laten dat ook zien. Een verzonnen plaats is
+// erger dan geen plaats; dezelfde regel als bij de strook.
+//
+// ⚓ HEEN EN TERUG MOET HETZELFDE OPLEVEREN. Een kast die uit een foto komt en weer
+// terugvertaald wordt, levert dezelfde groepen met dezelfde namen, karakteristieken
+// en stromen op. Vastgelegd in tests/test-aardlekgroepen.js.
+export function positiesUitAardlekgroepen(aardlekgroepen, opties = {}) {
+  const lijst = Array.isArray(aardlekgroepen) ? aardlekgroepen : [];
+  const verdelerId = String(opties.verdelerId || "v1");
+  const uit = [];
+  let n = 0;
+  // Een rail telt modules, geen groepen: de teller loopt per rail door zodat twee
+  // blokken op dezelfde rail niet op dezelfde plek belanden.
+  const plekPerRail = new Map();
+  const volgendePlek = (rail, breedte) => {
+    const nu = plekPerRail.get(rail) || 0;
+    plekPerRail.set(rail, nu + breedte);
+    return nu;
+  };
+
+  for (const ag of lijst) {
+    const rail = toNum(ag && ag.rail) > 0 ? toNum(ag.rail) : 1;
+    const driefasig = String((ag && ag.fase) || "") === "3";
+    // Welke groepen achter wélke aardlek hangen, staat in `aardlekId` — daar kijkt
+    // `blokIndeling` naar. Zonder dat veld valt elke groep in het blok "zonder
+    // aardlekschakelaar" en komt de kast er aan de andere kant anders uit.
+    let aardlekId = "";
+
+    if (ag && ag.rcdType && ag.rcdType !== "geen") {
+      const breedte = driefasig ? 4 : 2;
+      aardlekId = `p${n + 1}`;
+      uit.push({
+        id: `p${++n}`, verdelerId, rail,
+        positie: toNum(ag.plek) >= 0 ? toNum(ag.plek) : volgendePlek(rail, breedte),
+        breedteModules: breedte,
+        soort: "aardlek",
+        fabrikant: "", type: "",
+        karakteristiek: "", In: null,
+        IAn: toNum(ag.rcdMa) > 0 ? toNum(ag.rcdMa) : null,
+        aardlektype: String(ag.rcdType || "A"),
+        polen: driefasig ? 4 : 2,
+        fase: String(ag.L || ""),
+        groepstekst: "", kabel: "", plaatnummer: null,
+        functie: String(ag.naam || ""), functieEigen: Boolean(ag.naam),
+        standaardnaam: "", toelichting: "",
+      });
+    }
+
+    for (const e of ((ag && ag.eindgroepen) || [])) {
+      const breedte = toNum(e.modules) > 0 ? toNum(e.modules) : 1;
+      const kar = String(e.kar || "");
+      const amp = toNum(String(e.ampere || "").replace("A", ""));
+      uit.push({
+        id: `p${++n}`, verdelerId, aardlekId,
+        rail: toNum(e.rail) > 0 ? toNum(e.rail) : rail,
+        positie: toNum(e.plek) >= 0 ? toNum(e.plek) : volgendePlek(rail, breedte),
+        breedteModules: breedte,
+        // gG hoort bij een smeltveiligheid; dat onderscheid bepaalt het symbool op
+        // het schema én de Z_max-berekening, dus het mag hier niet verdwijnen.
+        soort: kar === "gG" ? "smeltveiligheid" : "automaat",
+        // ⚠️ NIET `e.type`. In een aardlekgroep is `type` het EINDGROEPTYPE (kook,
+        // laad, wp) en niet de typeaanduiding van het toestel. Die hier invullen
+        // zet "kook" als productcode op de sticker en in het groepenoverzicht.
+        // Merk en type zijn alleen bekend als de kast uit een foto of een paspoort
+        // komt — en dan zijn de posities er al en is deze brug niet nodig.
+        fabrikant: "", type: "",
+        karakteristiek: kar === "gG" ? "" : kar,
+        In: amp > 0 ? amp : null,
+        IAn: null, aardlektype: "",
+        polen: breedte >= 3 ? 4 : 1,
+        fase: String(e.L || ag.L || ""),
+        groepstekst: "", kabel: "", plaatnummer: null,
+        // De naam die de installateur zelf gaf is een keuze, geen aflezing — en
+        // precies die naam hoort straks op de sticker.
+        functie: String(e.naam || ""), functieEigen: Boolean(e.naam),
+        standaardnaam: "", toelichting: "",
+      });
+    }
+  }
+  return uit;
+}

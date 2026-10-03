@@ -196,3 +196,98 @@ export function strookUitAardlekgroepen(aardlekgroepen) {
   const breedte = modules.reduce((n, m) => n + m.modules, 0);
   return { rails, modules, breedte, breedtePx: breedte * MODULE_PX };
 }
+
+// ─── DE KLEUREN VAN EEN KASTBAND, IN WOORDEN ─────────────────────────────────
+//
+// Verhuisd uit Kastscan op 03-10-2026, samen met de documenten die ze gebruiken.
+// Een kleurband op een afdekplaat wordt op drie plaatsen gelezen en geschreven —
+// de strook op het scherm, het label op de kastdeur en het groepenoverzicht op
+// papier — en die drie moeten dezelfde tint bedoelen. Eén tabel dus.
+//
+// ⚓ EEN GELEZEN KLEUR GAAT VOOR. Staat er op de plaat "beveiligt de RODE
+// groepen", dan is dát de kleur van dat blok — niet de kleur die onze eigen
+// volgorde eraan zou geven. Anders spreekt de sticker de kast tegen.
+
+export const KLEURNAMEN = {
+  blauw: "#8FC4E8", lichtblauw: "#8FC4E8",
+  groen: "#A3D39C", lichtgroen: "#A3D39C",
+  oranje: "#F3BE8A", lichtoranje: "#F3BE8A",
+  geel: "#F0DC8C", lichtgeel: "#F0DC8C",
+  paars: "#C3A9D8", lila: "#C3A9D8",
+  rood: "#E9A0A0", roze: "#F0BCD0", bruin: "#C9A98A",
+  grijs: "#CFD4D8", wit: "#F2F2F2", zwart: "#9AA0A6",
+};
+
+// De kleuren die in een meterkast werkelijk op een band zitten. Kort gehouden:
+// een keuzelijst van vijftien tinten is in een meterkast onwerkbaar.
+export const KLEUR_KEUZE = ["blauw", "groen", "oranje", "geel", "rood", "grijs"];
+
+// NEDERLANDSE VERBUIGING. Op een plaat staat zelden "rood" maar bijna altijd
+// "de rode groepen". Bij blauw en groen valt dat niet op — "blauwe" bevat
+// "blauw" — maar rood wordt RODE en geel wordt GELE, en daar verdwijnt de stam.
+// Gevonden op een echte kast: "CR25 AARDLEKSCHAKELAAR BEVEILIGT ALLEEN DE
+// 'RODE' GEMERKTE GROEPEN" leverde geen kleur op.
+const KLEUR_VORMEN = {
+  rood: ["rood", "rode"],
+  geel: ["geel", "gele"],
+  grijs: ["grijs", "grijze"],
+  wit: ["wit", "witte"],
+  zwart: ["zwart", "zwarte"],
+  paars: ["paars", "paarse"],
+  blauw: ["blauw"], lichtblauw: ["lichtblauw"],
+  groen: ["groen"], lichtgroen: ["lichtgroen"],
+  oranje: ["oranje"], lichtoranje: ["lichtoranje"],
+  lichtgeel: ["lichtgeel"], lila: ["lila"], roze: ["roze"], bruin: ["bruin"],
+};
+
+export function kleurNaamNaarHex(naam) {
+  const n = String(naam || "").trim().toLowerCase();
+  if (!n) return "";
+  if (KLEURNAMEN[n]) return KLEURNAMEN[n];
+  // Langste vorm eerst, anders vindt "geel" nooit "lichtgeel".
+  const vormen = [];
+  for (const [kleur, lijst] of Object.entries(KLEUR_VORMEN)) {
+    for (const v of lijst) vormen.push([v, kleur]);
+  }
+  vormen.sort((a, b) => b[0].length - a[0].length);
+  for (const [vorm, kleur] of vormen) if (n.includes(vorm)) return KLEURNAMEN[kleur];
+  return "";
+}
+
+// De genormaliseerde kleurnaam ("rode" → "rood"), zodat wat we opslaan en tonen
+// één vorm heeft.
+export function kleurStam(tekst) {
+  const n = String(tekst || "").toLowerCase();
+  const vormen = [];
+  for (const [kleur, lijst] of Object.entries(KLEUR_VORMEN)) {
+    for (const v of lijst) vormen.push([v, kleur]);
+  }
+  vormen.sort((a, b) => b[0].length - a[0].length);
+  for (const [vorm, kleur] of vormen) if (n.includes(vorm)) return kleur;
+  return "";
+}
+
+// De legendaregels van de plaat: "Aardlekschakelaar beveiligt oranje groepen".
+// Dat is de VERKLARING van de band, dus een aflezing van de kleurvolgorde — in
+// de volgorde waarin ze op de plaat staan.
+export function kleurenUitLegenda(regels) {
+  const uit = [];
+  for (const r of Array.isArray(regels) ? regels : []) {
+    if (soortVerklaringsregel(r) !== "aardlek") continue;
+    const kleur = kleurStam(r);
+    if (kleur) uit.push(kleur);
+  }
+  return uit;
+}
+
+// De kleur van één aardlek: gelezen kleur vóór de ladder.
+export function aardlekKleur(code, gelezen) {
+  return kleurNaamNaarHex(gelezen) ||
+         AARDLEK_KLEUR[String(code || "").toUpperCase()] || "#546E7A";
+}
+
+export function aardlekKleurNaam(code, gelezen) {
+  const n = String(gelezen || "").trim().toLowerCase();
+  if (n && kleurNaamNaarHex(n)) return n;
+  return AARDLEK_KLEURNAAM[String(code || "").toUpperCase()] || "";
+}

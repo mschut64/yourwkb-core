@@ -20,7 +20,7 @@
 //   • schermen, teksten en opmaak.
 // ─────────────────────────────────────────────────────────────────────────────
 
-export { toNum } from "./getallen.js";
+export { toNum, komma } from "./getallen.js";
 
 export {
   GROTE_VERBRUIKERS_MKP, GELIJKTIJDIGHEID, GROOT_STANDAARD_KW,
@@ -72,6 +72,7 @@ export {
 
 export {
   EINDGROEP_UIT_MKP, EINDGROEP_ONBEKEND, eindgroepTypeUitFunctie, aardlekgroepenUitPosities,
+  positiesUitAardlekgroepen,
 } from "./aardlekgroepen.js";
 
 export {
@@ -81,6 +82,7 @@ export {
 export {
   MODULE_PX, AARDLEK_KLEUR, AARDLEK_KLEURNAAM, AARDLEK_BAND,
   aardlekCode, aardlekBandKleur, strookUitAardlekgroepen,
+  KLEURNAMEN, KLEUR_KEUZE, kleurNaamNaarHex, aardlekKleur, aardlekKleurNaam,
 } from "./vormtaal.js";
 
 // ─── DE MÉTING ───────────────────────────────────────────────────────────────
@@ -166,4 +168,4 @@ export {
 
 // De versie van de motor. Bij een gedragswijziging in een normregel hoort een
 // bewuste bump én een regel in LEESMIJ.md — de apps volgen een tag, geen branch.
-export const CORE_VERSIE = "0.10.0";
+export const CORE_VERSIE = "0.11.0";
