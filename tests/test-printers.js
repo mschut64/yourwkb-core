@@ -110,11 +110,17 @@ console.log("\u25b6 CATEGORIE 6: Apple — het ligt aan de browser, niet aan het
     const safari = webBluetoothStatus();
     eq(safari.ok, false, "6.1 Safari op iPhone kan het niet");
     eq(safari.reden, "ios", "6.2 en de reden is het toestel-plus-browser, niet 'browser'");
-    eq(/werkt wél/.test(safari.melding), true,
-       "6.3 de melding zegt dat het elders op dit toestel wél kan");
-    eq(/niet op (Apple|iPhone)/.test(safari.melding), false,
-       "6.4 en beweert nergens dat Apple het onmogelijk maakt");
+    // ⚓ De melding moet een WEG noemen en niet alleen een nee. "Gebruik een browser
+    // die het wel ondersteunt" is op een iPhone een lege verwijzing: wie dan
+    // Chrome installeert staat met dezelfde lege handen in de meterkast, want op
+    // iOS draait Chrome óók op WebKit.
+    eq(/Bluefy|WebBLE/.test(safari.melding), true,
+       "6.3 de melding noemt een browser-app die het op iOS wél kan");
+    eq(/WebKit/.test(safari.melding), true,
+       "6.4 en zegt waaróm Chrome daar niet helpt: elke browser draait op WebKit");
     eq(/labelvel/.test(safari.melding), true, "6.5 met het A4-vel als uitwijk");
+    eq(/onmogelijk|kan niet op Apple/.test(safari.melding), false,
+       "6.5b en nergens de bewering dat het op Apple onmogelijk is");
 
     // 2. ⚓ DE KERN: een browser op een iPhone die Web Bluetooth wél heeft. Dan
     //    hoort de knop er gewoon te staan. Dit faalt zodra iemand de

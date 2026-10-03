@@ -60,13 +60,26 @@ export function webBluetoothStatus() {
     return {
       ok: false,
       reden: ios ? "ios" : "browser",
-      // ⚠️ NIET "WERKT NIET OP APPLE". Het ligt aan de BROWSER, niet aan het merk:
-      // Safari kent Web Bluetooth niet, maar op een Mac doen Chrome en Edge het
-      // gewoon, en op een iPhone of iPad werkt het in een browser die Web
-      // Bluetooth wél ondersteunt. Veldbevestigd 03-10-2026. Een melding die zegt
-      // dat het op Apple onmogelijk is, stuurt iemand onnodig naar het papier.
+      // ⚠️ TWEE DINGEN DIE HIER ALLEBEI WAAR ZIJN, EN DIE ELKAAR LIJKEN TEGEN TE
+      // SPREKEN. (1) Het ligt aan de BROWSER en niet aan het merk — op een Mac
+      // doen Chrome en Edge dit gewoon, en op een iPhone bestaan browser-apps die
+      // Web Bluetooth zélf meebrengen. (2) Chrome OP iOS kan het niet, en dat is
+      // geen instelling die we aan kunnen zetten: Apple schrijft voor dat elke
+      // browser op iPhone en iPad op WebKit draait, dus Chrome en Edge zijn daar
+      // Safari met een ander jasje. Een service worker of een geïnstalleerde PWA
+      // verandert daar niets aan — die levert geen motor, hij bewaart alleen
+      // bestanden. De DMA staat andere motoren inmiddels toe, maar uitgerold is
+      // er niets. (Nagezocht 03-10-2026.)
+      //
+      // ⚓ DAAROM NOEMT DEZE MELDING DE ECHTE WEG. "Een browser die het wel
+      // ondersteunt" is op een iPhone een lege verwijzing — iemand installeert
+      // dan Chrome en staat met dezelfde lege handen in de meterkast. Bluefy en
+      // WebBLE zijn browser-apps die Web Bluetooth bovenop CoreBluetooth zelf
+      // implementeren; daar werkt deze knop wél, en de app ziet dat vanzelf
+      // omdat hij hierboven naar `navigator.bluetooth` kijkt en niet naar het
+      // toestel.
       melding: ios
-        ? "Safari op iPhone en iPad kent geen Web Bluetooth. Het werkt wél in een browser die dat ondersteunt, en op een Mac in Chrome of Edge. Anders: print het A4-labelvel."
+        ? "Op een iPhone of iPad draait élke browser op WebKit — ook Chrome en Edge — en die kent geen Web Bluetooth. Het kan wél met een browser-app die het zelf meebrengt (Bluefy, WebBLE), of vanaf een Mac of laptop in Chrome of Edge. Anders: print het A4-labelvel."
         : "Deze browser ondersteunt Web Bluetooth niet. Gebruik Chrome of Edge, of print het A4-labelvel.",
     };
   }
