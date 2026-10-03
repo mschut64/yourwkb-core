@@ -241,7 +241,10 @@ console.log("▶ CATEGORIE 7: wiens document is dit");
 {
   console.log("▶ CATEGORIE 9: hoe breed een sticker wordt");
 
-  eq(RISICO_DWINGT_VOL_LABEL, true, "9.1 een restrisico dwingt een vol label");
+  // Normbesluit van Martin, 03-10-2026 — geen implementatiekeuze. Deze test staat
+  // er zodat een latere opruiming hem niet "logischer" maakt.
+  eq(RISICO_DWINGT_VOL_LABEL, true,
+     "9.1 een restrisico dwingt een vol label — bevestigd door Martin 03-10-2026");
   eq(LANGE_NAAM_DWINGT_VOL_LABEL, true, "9.2 en een naam die niet past ook");
 
   eq(labelBreedteVoorModules(1, true, "Zonnepanelen"), 30,

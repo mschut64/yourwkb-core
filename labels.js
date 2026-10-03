@@ -229,10 +229,18 @@ export function hoofdschakelaarAdvies(fasen, hoofdzekering, heeftKrachtgroep) {
 //     invoerfout worden en zou de installateur namen gaan afkorten om de
 //     generator tevreden te houden. Dat is de verkeerde kant op werken.
 //
-// TE BEVESTIGEN DOOR MARTIN: rev3.0 laat beide gevallen open. De andere uitweg
-// is het smalle label zijn titel ontnemen en de naam alleen op de uitlijnstrook
-// en het groepenoverzicht te zetten. Twee constanten om.
+// ⚓ BEVESTIGD DOOR MARTIN, 03-10-2026: "risicoregel dwingt 30 mm blijft goed zo".
+// Rev3.0 laat het open, dus dit is een normbesluit van de domeinexpert en geen
+// implementatiekeuze — zet hem niet terug omdat een label over de buurgroep
+// steekt. Dat oversteken is bewust de mindere van twee kwaden tegenover een
+// pv-groep zonder markering.
 export const RISICO_DWINGT_VOL_LABEL = true;
+
+// Het tweede geval (een naam die niet op 15 mm past) is niet apart voorgelegd en
+// staat gewoon aan. De andere uitweg zou zijn het smalle label zijn titel te
+// ontnemen en de naam alleen op de uitlijnstrook en het groepenoverzicht te
+// zetten; die vraag ligt er nog, maar hij is niet dringend — niemand heeft er
+// last van, en wat niet past wordt sowieso als invoerfout gemeld.
 export const LANGE_NAAM_DWINGT_VOL_LABEL = true;
 
 export function labelBreedteVoorModules(modules, heeftRisico, titel) {
