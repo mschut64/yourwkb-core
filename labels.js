@@ -236,11 +236,12 @@ export function hoofdschakelaarAdvies(fasen, hoofdzekering, heeftKrachtgroep) {
 // pv-groep zonder markering.
 export const RISICO_DWINGT_VOL_LABEL = true;
 
-// Het tweede geval (een naam die niet op 15 mm past) is niet apart voorgelegd en
-// staat gewoon aan. De andere uitweg zou zijn het smalle label zijn titel te
-// ontnemen en de naam alleen op de uitlijnstrook en het groepenoverzicht te
-// zetten; die vraag ligt er nog, maar hij is niet dringend — niemand heeft er
-// last van, en wat niet past wordt sowieso als invoerfout gemeld.
+// ⚓ OOK BEVESTIGD DOOR MARTIN, 03-10-2026: "lange naam dwingt ook vol label, laat
+// maar staan". De alternatieve uitweg — het smalle label zijn titel ontnemen en
+// de naam alleen op de uitlijnstrook en het groepenoverzicht zetten — is daarmee
+// van tafel. Een sticker zonder naam zou de installateur dwingen elders te kijken
+// om te weten welke groep hij voor zich heeft, en dat is precies wat deze labels
+// moeten voorkomen. Rev3.0 laat beide gevallen open; ze liggen nu allebei vast.
 export const LANGE_NAAM_DWINGT_VOL_LABEL = true;
 
 export function labelBreedteVoorModules(modules, heeftRisico, titel) {
