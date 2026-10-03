@@ -88,6 +88,66 @@ eq(typeof niimbotB1.ondersteund, "function", "5.4 en zeggen of de browser hem aa
   eq(beschikbareDrivers().length, 0, "5.7 dus er is daar geen enkele driver beschikbaar");
 }
 
+console.log("\u25b6 CATEGORIE 6: Apple — het ligt aan de browser, niet aan het merk");
+//
+// Martin meldde op 03-10-2026 dat de Niimbot in Kastscan óók op Apple print. De
+// melding zei toen dat het daar "niet werkt". Deze tests leggen vast wat er
+// werkelijk telt: of de BROWSER Web Bluetooth heeft. De volgorde van de
+// controles is daarbij het hele punt — wordt er eerst op het toestel gekeken,
+// dan sluit de app een iPhone buiten die het wél kan.
+{
+  const echteNav = globalThis.navigator, echtWin = globalThis.window;
+  const zet = (nav, win) => {
+    Object.defineProperty(globalThis, "navigator", { value: nav, configurable: true });
+    Object.defineProperty(globalThis, "window", { value: win, configurable: true });
+  };
+  const IOS_UA = "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15";
+  const MAC_UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/131";
+
+  try {
+    // 1. Safari op een iPhone: geen Web Bluetooth. Een nee, maar wel een eerlijke.
+    zet({ userAgent: IOS_UA }, { isSecureContext: true });
+    const safari = webBluetoothStatus();
+    eq(safari.ok, false, "6.1 Safari op iPhone kan het niet");
+    eq(safari.reden, "ios", "6.2 en de reden is het toestel-plus-browser, niet 'browser'");
+    eq(/werkt wél/.test(safari.melding), true,
+       "6.3 de melding zegt dat het elders op dit toestel wél kan");
+    eq(/niet op (Apple|iPhone)/.test(safari.melding), false,
+       "6.4 en beweert nergens dat Apple het onmogelijk maakt");
+    eq(/labelvel/.test(safari.melding), true, "6.5 met het A4-vel als uitwijk");
+
+    // 2. ⚓ DE KERN: een browser op een iPhone die Web Bluetooth wél heeft. Dan
+    //    hoort de knop er gewoon te staan. Dit faalt zodra iemand de
+    //    toestelcontrole vóór de browsercontrole zet.
+    zet({ userAgent: IOS_UA, bluetooth: {} }, { isSecureContext: true });
+    eq(webBluetoothStatus().ok, true,
+       "6.6 een iPhone-browser mét Web Bluetooth mag gewoon printen");
+
+    // 3. Een Mac in Chrome: dat is sinds jaar en dag gewoon een ja.
+    zet({ userAgent: MAC_UA, bluetooth: {} }, { isSecureContext: true });
+    eq(webBluetoothStatus().ok, true, "6.7 en een Mac in Chrome ook");
+
+    // 4. Safari op een Mac heeft het evenmin, maar dat is een browserkwestie.
+    zet({ userAgent: "Mozilla/5.0 (Macintosh; Intel Mac OS X) Version/18.0 Safari/605.1.15" },
+        { isSecureContext: true });
+    const macSafari = webBluetoothStatus();
+    eq(macSafari.reden, "browser", "6.8 Safari op een Mac is een browserkwestie");
+    eq(/Chrome of Edge/.test(macSafari.melding), true, "6.9 met de uitweg erbij");
+
+    // 5. http is geen https: bluetooth mag daar niet, en dát is de reden.
+    zet({ userAgent: MAC_UA, bluetooth: {} }, { isSecureContext: false });
+    eq(webBluetoothStatus().reden, "onveilig", "6.10 zonder https is het de verbinding");
+
+    // 6. En een driver meldt zich beschikbaar zodra de browser het aankan.
+    zet({ userAgent: IOS_UA, bluetooth: {} }, { isSecureContext: true });
+    eq(beschikbareDrivers().length, 1, "6.11 op zo'n iPhone is de Niimbot-driver beschikbaar");
+  } finally {
+    Object.defineProperty(globalThis, "navigator", { value: echteNav, configurable: true });
+    if (echtWin === undefined) delete globalThis.window;
+    else Object.defineProperty(globalThis, "window", { value: echtWin, configurable: true });
+  }
+}
+
 console.log("\n═══════════════════════════════════════════════");
 console.log(`RESULTAAT: ${passed} geslaagd · ${failed} mislukt · ${passed + failed} totaal`);
 console.log("═══════════════════════════════════════════════");
