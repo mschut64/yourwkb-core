@@ -206,8 +206,40 @@ export function hoofdschakelaarAdvies(fasen, hoofdzekering, heeftKrachtgroep) {
 
 // DE BREEDTE IS HET MERKTEKEN (§5): een label van 15 mm betekent 1 module.
 // Daarom vervalt het modulemerk op de smalle variant.
-export function labelBreedteVoorModules(modules) {
-  return Number(modules) === 1 ? DRAGER.breedSmalMm : DRAGER.breedVolMm;
+//
+// 🚨 TWEE UITZONDERINGEN, EN DIE ZIJN BIJ DE VERHUIZING BIJNA ZOEKGERAAKT.
+// Deze functie stond in twee versies naast elkaar: hier een met alleen het
+// modulegetal, en in Kastscans model.js een met de twee uitzonderingen. Toen
+// `labelSelectie` op 03-10-2026 hierheen verhuisde, riep hij de versie hiernaast
+// aan — met drie argumenten, waarvan er twee werden genegeerd. JavaScript klaagt
+// daar niet over. Gevolg: een pv-groep van één module kreeg een smal label waar
+// zijn risicoregel niet op past, en een gewone groepsnaam liep over de rand. De
+// tests hieronder bestaan daarom, en deze functie is nu de énige.
+//
+// 1 · EEN RISICOREGEL DWINGT EEN VOL LABEL. Bij 3,5 mm korps past er op 11,5 mm
+//     ongeveer negen tekens, en daar past geen enkele risicoregel op. Een groep
+//     met een reëel restrisico (pv, accu, laadpunt) krijgt daarom altijd 30 mm.
+//     Het label steekt dan over de buurgroep — de mindere van twee kwaden
+//     tegenover een pv-groep zonder markering, waar NEN 1010 712.514.101 juist
+//     wél om vraagt.
+//
+// 2 · EEN NAAM DIE NIET OP 15 MM PAST DWINGT EEN VOL LABEL. Op 4,25 mm draagt
+//     11,5 mm ongeveer zes tekens: "Keuken" en "Oven" passen, "Vaatwasser" en
+//     "Wasmachine" niet. Zonder deze regel zou elke gewone groepsnaam een
+//     invoerfout worden en zou de installateur namen gaan afkorten om de
+//     generator tevreden te houden. Dat is de verkeerde kant op werken.
+//
+// TE BEVESTIGEN DOOR MARTIN: rev3.0 laat beide gevallen open. De andere uitweg
+// is het smalle label zijn titel ontnemen en de naam alleen op de uitlijnstrook
+// en het groepenoverzicht te zetten. Twee constanten om.
+export const RISICO_DWINGT_VOL_LABEL = true;
+export const LANGE_NAAM_DWINGT_VOL_LABEL = true;
+
+export function labelBreedteVoorModules(modules, heeftRisico, titel) {
+  if (heeftRisico && RISICO_DWINGT_VOL_LABEL) return DRAGER.breedVolMm;
+  if (toNum(modules) !== 1) return DRAGER.breedVolMm;
+  if (LANGE_NAAM_DWINGT_VOL_LABEL && !naamPastOpSmalLabel(titel)) return DRAGER.breedVolMm;
+  return DRAGER.breedSmalMm;
 }
 
 // ─── HET AARDLEKMERK ──────────────────────────────────────────────────────────

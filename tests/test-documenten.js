@@ -16,7 +16,8 @@
 
 import { positiesUitAardlekgroepen, aardlekgroepenUitPosities, komma, aardlekKleur,
          aardlekKleurNaam, faseBalans } from "../index.js";
-import { labelSelectie, controleerPassend, korteNaam, labelDatum, voetDatum } from "../labels.js";
+import { labelSelectie, controleerPassend, korteNaam, labelDatum, voetDatum,
+         labelBreedteVoorModules, RISICO_DWINGT_VOL_LABEL, LANGE_NAAM_DWINGT_VOL_LABEL } from "../labels.js";
 import { groepenoverzichtHtml, labelvelHtml, schemaHtml, velIndeling, ontsmet } from "../documenten.js";
 import { readFileSync } from "node:fs";
 import { schemaVanKast, ontwerpSchema } from "../schema.js";
@@ -225,6 +226,67 @@ console.log("▶ CATEGORIE 7: wiens document is dit");
                              { datum: labelDatum(new Date(2026, 9, 3)) });
   const datumfouten = smal.flatMap(l => controleerPassend(l).filter(f => /\d{2}-\d{2}-\d{2}/.test(f.tekst)));
   eq(datumfouten.length, 0, "8.7 geen enkele sticker klaagt nog over de datum");
+}
+
+// ─── CATEGORIE 9: hoe breed een sticker wordt ────────────────────────────────
+//
+// 🚨 Deze tests bestaan om een fout die bij de verhuizing is ontstaan en die in
+// YourWkb live heeft gestaan. `labelBreedteVoorModules` bestond in twee versies:
+// in labels.js een met alleen het modulegetal, en in Kastscans model.js een met
+// twee uitzonderingen erbij. Toen `labelSelectie` naar labels.js verhuisde, riep
+// hij de versie náást zich aan — met drie argumenten, waarvan er twee werden
+// genegeerd, en JavaScript zwijgt daarover. Een pv-groep van één module kreeg
+// daardoor een smal label waar zijn risicoregel niet op past, en een gewone
+// groepsnaam liep over de rand. Dezelfde gevallen als in Kastscans eigen suite.
+{
+  console.log("▶ CATEGORIE 9: hoe breed een sticker wordt");
+
+  eq(RISICO_DWINGT_VOL_LABEL, true, "9.1 een restrisico dwingt een vol label");
+  eq(LANGE_NAAM_DWINGT_VOL_LABEL, true, "9.2 en een naam die niet past ook");
+
+  eq(labelBreedteVoorModules(1, true, "Zonnepanelen"), 30,
+     "9.3 pv op één module krijgt 30 mm — anders past de risicoregel er niet op");
+  eq(labelBreedteVoorModules(1, false, "Keuken"), 15, "9.4 een korte naam past op 15 mm");
+  eq(labelBreedteVoorModules(1, false, "Vaatwasser"), 15,
+     "9.5 en een standaardnaam met afkorting ook");
+  eq(labelBreedteVoorModules(1, false, "Achterhuis mevrouw"), 30,
+     "9.6 een lange naam zonder afkorting dwingt 30 mm");
+  eq(labelBreedteVoorModules(1, false, "Bijkeuken achter"), 30, "9.7 net als deze");
+  eq(labelBreedteVoorModules(2, false, "Oven"), 30, "9.8 twee modules is altijd 30 mm");
+
+  // ⚓ En de weg erheen: `labelSelectie` moet die regel ook echt gebruiken. Dit
+  // is wat er misging — de functie werkte, de aanroep gaf de argumenten door, en
+  // tóch kwam er 15 mm uit.
+  // De posities komen uit dezelfde brug als de rest van deze suite, zodat de
+  // vorm klopt: een eigen naam (`functieEigen`) is wat een apparaatsticker
+  // oplevert, en één module is wat de breedte op scherp zet.
+  const eenGroep = (naam) => positiesUitAardlekgroepen([
+    { id: "a1", naam: "Aardlek 1", rcdType: "A", rcdMa: "30", fase: "1", eindgroepen: [
+      { id: "e1", naam, kar: "B", ampere: "16A", modules: 1 },
+    ]},
+  ]);
+  const apparaatVan = (naam) => labelSelectie(
+    { id: "v1", posities: eenGroep(naam) },
+    { datum: labelDatum(new Date(2026, 9, 3)) },
+  ).find((l) => l.soort === "apparaat");
+
+  const pvLabel = apparaatVan("Zonnepanelen");
+  eq(pvLabel ? pvLabel.breedteMm : null, 30,
+     "9.9 een pv-groep van één module levert via labelSelectie een vol label op");
+
+  const langLabel = apparaatVan("Bijkeuken");
+  eq(langLabel ? langLabel.breedteMm : null, 30,
+     "9.10 en een naam die niet op 15 mm past net zo");
+  eq(langLabel ? controleerPassend(langLabel).length : -1, 0,
+     "9.11 en dan past hij ook echt — geen overloopmelding meer");
+
+  // ⚓ De regel maakt niet alles passend, en dat hoort ook niet. Een naam die op
+  // 30 mm nog te lang is blijft een INVOERFOUT met een telling (§2/§3) — de
+  // letter wordt niet verkleind, de installateur kort de naam in.
+  const teLang = apparaatVan("Wandcontactdozen woonkamer");
+  eq(teLang ? teLang.breedteMm : null, 30, "9.12 een heel lange naam krijgt het volle label");
+  eq(teLang ? controleerPassend(teLang).length : 0, 1,
+     "9.13 en wordt dan alsnog gemeld in plaats van weggetypografeerd");
 }
 
 console.log("\n═══════════════════════════════════════════════");

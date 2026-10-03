@@ -168,4 +168,4 @@ export {
 
 // De versie van de motor. Bij een gedragswijziging in een normregel hoort een
 // bewuste bump én een regel in LEESMIJ.md — de apps volgen een tag, geen branch.
-export const CORE_VERSIE = "0.11.0";
+export const CORE_VERSIE = "0.11.1";
