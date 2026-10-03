@@ -60,8 +60,13 @@ export function webBluetoothStatus() {
     return {
       ok: false,
       reden: ios ? "ios" : "browser",
+      // ⚠️ NIET "WERKT NIET OP APPLE". Het ligt aan de BROWSER, niet aan het merk:
+      // Safari kent Web Bluetooth niet, maar op een Mac doen Chrome en Edge het
+      // gewoon, en op een iPhone of iPad werkt het in een browser die Web
+      // Bluetooth wél ondersteunt. Veldbevestigd 03-10-2026. Een melding die zegt
+      // dat het op Apple onmogelijk is, stuurt iemand onnodig naar het papier.
       melding: ios
-        ? "Rechtstreeks printen via bluetooth werkt niet in Safari op iPhone of iPad. Gebruik het A4-labelvel, of print vanaf een Android-telefoon of laptop met Chrome."
+        ? "Safari op iPhone en iPad kent geen Web Bluetooth. Het werkt wél in een browser die dat ondersteunt, en op een Mac in Chrome of Edge. Anders: print het A4-labelvel."
         : "Deze browser ondersteunt Web Bluetooth niet. Gebruik Chrome of Edge, of print het A4-labelvel.",
     };
   }
