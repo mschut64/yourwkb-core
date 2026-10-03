@@ -180,6 +180,24 @@ console.log("▶ CATEGORIE 6: afdrukken — twee lessen die elkaar bijten");
   eq(/ontsmet\(html\)/.test(fn), true, "6.8 en wat erin gaat is ontsmet");
 }
 
+console.log("▶ CATEGORIE 7: wiens document is dit");
+{
+  // Deze documenten komen uit Kastscan en droegen die naam in de kop, de voet en
+  // onder de QR. Een overzicht dat YourWkb maakt met "Kastscan" erop is voor de
+  // installateur die het ophangt onnavolgbaar.
+  eq(/Kastscan/.test(HTML), false, "7.1 er staat geen vreemde merknaam op");
+  eq((HTML.match(/class="merknaam">([^<]*)/) || [])[1], "YourWkb", "7.2 standaard staat er YourWkb");
+  const vanKastscan = groepenoverzichtHtml(KAST, { merk: "Kastscan" });
+  eq((vanKastscan.match(/class="merknaam">([^<]*)/) || [])[1], "Kastscan",
+     "7.3 en elke app kan zeggen wie hij is");
+  eq(vanKastscan.includes("opgesteld met Kastscan"), true, "7.4 ook in de voetregel");
+  eq(labelvelHtml([], { merk: "Kastscan" }).includes("Labelvel Kastscan"), true,
+     "7.5 en op het labelvel");
+  // Een kop met een leeg vak eronder leest als een fout; dan liever geen kop.
+  eq(HTML.includes("Verdeling over de fasen"), false,
+     "7.6 zonder balans staat de fasekop er niet — een lege kop oogt als een storing");
+}
+
 console.log("\n═══════════════════════════════════════════════");
 console.log(`RESULTAAT: ${passed} geslaagd · ${failed} mislukt · ${passed + failed} totaal`);
 console.log("═══════════════════════════════════════════════");

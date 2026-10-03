@@ -35,6 +35,14 @@ import { aardlekCode, aardlekKleur, AARDLEK_KLEURNAAM } from "./vormtaal.js";
 import { FASE_KLEUR } from "./fasen.js";
 // Oordelen over een kast zijn van de app, niet van de motor. Wie niets meegeeft
 // krijgt een document zonder die regels — leeg laten is beter dan iets beweren.
+// ⚓ DE MERKNAAM KOMT VAN DE APP. Deze documenten zijn uit Kastscan verhuisd en
+// droegen die naam in de kop, in de voet en onder de QR. Een groepenoverzicht dat
+// YourWkb maakt en waarop "Kastscan" staat, is voor de installateur die het
+// ophangt onnavolgbaar — en voor de klant die het leest ook. Eén optie dus, en
+// elke app zegt wie hij is.
+const MERK_STANDAARD = "YourWkb";
+const merkVan = (o) => esc((o && o.merk) || MERK_STANDAARD);
+
 const GEEN_SIGNALEN = () => [];
 const GEEN_SAMENVATTING = () => "";
 
@@ -371,7 +379,7 @@ li.afwijking::before{content:"X"}
     <div>
       <div style="display:flex;align-items:center;gap:3mm;margin-bottom:2mm">
         ${MERKVLAK}
-        <span class="merknaam">Kastscan</span>
+        <span class="merknaam">${merkVan(o)}</span>
       </div>
       <h1>Groepenoverzicht</h1>
       <div class="sub">${esc(adresRegel)}</div>
@@ -380,14 +388,14 @@ li.afwijking::before{content:"X"}
   <div class="rechts">
     ${o.bedrijf ? `<div><strong>${esc(o.bedrijf)}</strong></div>` : ""}
     <div>${esc(datum)}</div>
-    <div>Kastscan${o.versie ? " " + esc(o.versie) : ""}</div>
+    <div>${merkVan(o)}${o.versie ? " " + esc(o.versie) : ""}</div>
   </div>
 </div>
 
 ${secties}
 
 <div class="voet">
-  Dit overzicht is opgesteld met Kastscan. De indeling en de waarden zijn door de installateur bevestigd;
+  Dit overzicht is opgesteld met ${merkVan(o)}. De indeling en de waarden zijn door de installateur bevestigd;
   hij blijft verantwoordelijk voor de juistheid. Waarden die uit een foto zijn voorgesteld en niet leesbaar
   waren, staan leeg — die zijn niet geraden.
   <br>Vermogens per fase zijn een <strong>indicatie</strong> op basis van de groepsfunctie, geen meetwaarde.
@@ -440,7 +448,7 @@ function mkpStickerHtml(qrDataUrl, adresRegel, datum) {
       ${adres ? `<div class="adres">${esc(adres)}</div>` : ""}
       <img src="${esc(qrDataUrl)}" alt="QR-code meterkastpaspoort">
       <div class="klein">Scan met je telefooncamera · bijgewerkt ${esc(datum)}</div>
-      <div class="klein">meterkastpaspoort.nl — open standaard · gemaakt met Kastscan</div>
+      <div class="klein">meterkastpaspoort.nl — open standaard · gemaakt met ${merkVan(opties)}</div>
     </div>
   </div>
 
@@ -605,8 +613,8 @@ function verdelerSectie(v, qrDataUrl, opties = {}) {
        groep ${nrsVan(zonder)}.</div>` : ""}`;
   })()}
 
-  <h3>Verdeling over de fasen — indicatie</h3>
-  <div class="kaart"><div class="rij">${faseKaarten}</div></div>
+  ${faseKaarten ? `<h3>Verdeling over de fasen — indicatie</h3>
+  <div class="kaart"><div class="rij">${faseKaarten}</div></div>` : ""}
 
   <div class="punten">
     <h3>Aandachtspunten</h3>
@@ -707,7 +715,7 @@ export function labelvelHtml(labels, opties) {
   }).join("");
 
   return `<!doctype html><html lang="nl"><head><meta charset="utf-8">
-<title>Labelvel Kastscan</title>
+<title>Labelvel ${merkVan(o)}</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700&display=swap">
 <style>
 ${BASIS_CSS}
